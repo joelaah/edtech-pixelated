@@ -14,7 +14,8 @@ extension FirebaseFutureExtension<T> on Future<T> {
     return timeout(
       duration,
       onTimeout: () {
-        final message = '⏰ [TIMEOUT] ${taskName ?? "Firebase operation"} exceeded ${duration.inSeconds}s';
+        final message =
+            '⏰ [TIMEOUT] ${taskName ?? "Firebase operation"} exceeded ${duration.inSeconds}s';
         AppLogger.instance.e(message);
         throw TimeoutException(message);
       },
@@ -47,7 +48,11 @@ mixin FirebaseGuardedExecution {
     } on AppException catch (e) {
       return Failure<T>(e);
     } catch (e, stackTrace) {
-      AppLogger.instance.e('Unexpected error in $taskName: ${e.toString()}', error: e, stackTrace: stackTrace);
+      AppLogger.instance.e(
+        'Unexpected error in $taskName: ${e.toString()}',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Failure<T>(
         FirestoreException(
           message: e.toString(),
@@ -64,9 +69,15 @@ mixin FirebaseGuardedExecution {
     required String taskName,
   }) {
     try {
-      return streamAction().map((data) => Success<T>(data)).handleError((Object e, StackTrace stackTrace) {
+      return streamAction().map((data) => Success<T>(data)).handleError((
+        Object e,
+        StackTrace stackTrace,
+      ) {
         if (e is FirebaseException) {
-          AppLogger.instance.e('$taskName failed (Firebase): ${e.message}', error: e);
+          AppLogger.instance.e(
+            '$taskName failed (Firebase): ${e.message}',
+            error: e,
+          );
           return Failure<T>(
             FirestoreException(
               message: e.message ?? 'Stream operation failed',
@@ -75,7 +86,11 @@ mixin FirebaseGuardedExecution {
             ),
           );
         }
-        AppLogger.instance.e('$taskName failed (Unknown): ${e.toString()}', error: e, stackTrace: stackTrace);
+        AppLogger.instance.e(
+          '$taskName failed (Unknown): ${e.toString()}',
+          error: e,
+          stackTrace: stackTrace,
+        );
         return Failure<T>(
           FirestoreException(
             message: e.toString(),
@@ -85,7 +100,11 @@ mixin FirebaseGuardedExecution {
         );
       });
     } catch (e, stackTrace) {
-      AppLogger.instance.e('Error setting up stream $taskName: ${e.toString()}', error: e, stackTrace: stackTrace);
+      AppLogger.instance.e(
+        'Error setting up stream $taskName: ${e.toString()}',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Stream.value(
         Failure<T>(
           FirestoreException(

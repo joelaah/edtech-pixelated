@@ -5,23 +5,16 @@ import 'package:bitwise_academy/core/widgets/hp_bar.dart';
 
 void main() {
   Widget createWidgetUnderTest(Widget child) {
-    return MaterialApp(
-      home: Scaffold(
-        body: child,
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   group('HpBar Widget Tests', () {
-    testWidgets('renders label and value correctly',
-        (WidgetTester tester) async {
+    testWidgets('renders label and value correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createWidgetUnderTest(
-          const HpBar(
-            label: 'HEALTH',
-            value: '50/100',
-            progress: 0.5,
-          ),
+          const HpBar(label: 'HEALTH', value: '50/100', progress: 0.5),
         ),
       );
 
@@ -48,8 +41,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('handles negative progress by clamping to 0',
-        (WidgetTester tester) async {
+    testWidgets('handles negative progress by clamping to 0', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createWidgetUnderTest(
           const HpBar(

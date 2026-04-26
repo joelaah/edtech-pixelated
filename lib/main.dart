@@ -27,9 +27,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   AppLogger.instance.i('Firebase initialized for project: edtech-3f6fe');
 
   // Setup Firebase Sandbox / Emulators
@@ -38,13 +36,17 @@ Future<void> main() async {
   // may initialize against production and cache writes locally.
   if (useFirebaseEmulator) {
     try {
-      final String host = defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2' : '127.0.0.1';
-      
+      final String host = defaultTargetPlatform == TargetPlatform.android
+          ? '10.0.2.2'
+          : '127.0.0.1';
+
       await FirebaseAuth.instance.useAuthEmulator(host, 9099);
       FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
       await FirebaseStorage.instance.useStorageEmulator(host, 9199);
-      
-      AppLogger.instance.w('⚠️ RUNNING IN FIREBASE SANDBOX MODE (EMULATORS ENABLED) ⚠️');
+
+      AppLogger.instance.w(
+        '⚠️ RUNNING IN FIREBASE SANDBOX MODE (EMULATORS ENABLED) ⚠️',
+      );
     } catch (e) {
       AppLogger.instance.e('Failed to connect to Firebase emulators: $e');
     }
@@ -55,9 +57,7 @@ Future<void> main() async {
   // emulator and failures are surfaced immediately instead of being cached.
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: !useFirebaseEmulator,
-    cacheSizeBytes: useFirebaseEmulator
-        ? null
-        : Settings.CACHE_SIZE_UNLIMITED,
+    cacheSizeBytes: useFirebaseEmulator ? null : Settings.CACHE_SIZE_UNLIMITED,
   );
 
   // Configure dependency injection

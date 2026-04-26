@@ -8,11 +8,7 @@ sealed class AppException implements Exception {
   final String? code;
   final StackTrace? stackTrace;
 
-  const AppException({
-    required this.message,
-    this.code,
-    this.stackTrace,
-  });
+  const AppException({required this.message, this.code, this.stackTrace});
 
   @override
   String toString() => 'AppException($code): $message';
@@ -29,11 +25,7 @@ final class NetworkException extends AppException {
 
 /// Thrown when Firebase Auth operations fail.
 final class AuthException extends AppException {
-  const AuthException({
-    required super.message,
-    super.code,
-    super.stackTrace,
-  });
+  const AuthException({required super.message, super.code, super.stackTrace});
 }
 
 /// Thrown when Firestore read/write operations fail.

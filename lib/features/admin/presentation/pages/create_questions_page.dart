@@ -43,11 +43,11 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
   final List<QuestionModel> _addedQuestions = [];
 
   List<TextEditingController> get _optionControllers => [
-        _optionAController,
-        _optionBController,
-        _optionCController,
-        _optionDController,
-      ];
+    _optionAController,
+    _optionBController,
+    _optionCController,
+    _optionDController,
+  ];
 
   @override
   void dispose() {
@@ -74,8 +74,7 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
     }
     for (int i = 0; i < options.length; i++) {
       if (options[i].isEmpty) {
-        _showSnackBar(
-            'Please fill in Option ${String.fromCharCode(65 + i)}.');
+        _showSnackBar('Please fill in Option ${String.fromCharCode(65 + i)}.');
         return;
       }
     }
@@ -107,7 +106,8 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
           _addedQuestions.add(data);
           _clearForm();
           _showSnackBar(
-              'Question ${_addedQuestions.length} added successfully!');
+            'Question ${_addedQuestions.length} added successfully!',
+          );
         case Failure(:final exception):
           _showSnackBar('Failed: ${exception.message}');
       }
@@ -138,15 +138,11 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
 
-  int get _totalMarks =>
-      _addedQuestions.fold(0, (sum, q) => sum + q.points);
+  int get _totalMarks => _addedQuestions.fold(0, (sum, q) => sum + q.points);
 
   @override
   Widget build(BuildContext context) {
@@ -318,7 +314,9 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                            left: 2, bottom: AppSpacing.sm),
+                          left: 2,
+                          bottom: AppSpacing.sm,
+                        ),
                         child: Text(
                           'CORRECT_ANSWER',
                           style: AppTypography.headlineXs.copyWith(
@@ -524,8 +522,9 @@ class _CreateQuestionsPageState extends State<CreateQuestionsPage> {
             decoration: BoxDecoration(
               color: isCorrect ? AppColors.secondary : Colors.transparent,
               border: Border.all(
-                color:
-                    isCorrect ? AppColors.secondary : AppColors.outlineVariant,
+                color: isCorrect
+                    ? AppColors.secondary
+                    : AppColors.outlineVariant,
                 width: 3,
               ),
             ),

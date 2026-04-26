@@ -64,19 +64,19 @@ class ExamModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        subject,
-        difficultyTier,
-        durationMinutes,
-        createdBy,
-        status,
-        xpReward,
-        questionCount,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    title,
+    description,
+    subject,
+    difficultyTier,
+    durationMinutes,
+    createdBy,
+    status,
+    xpReward,
+    questionCount,
+    createdAt,
+    updatedAt,
+  ];
 }
 
 /// Difficulty tiers matching the design mockups.

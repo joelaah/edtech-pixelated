@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bitwise_academy/core/services/feature_flag_service.dart';
 
 /// A widget that toggles its content based on a feature flag.
-/// 
+///
 /// If the [flagName] is enabled in [FeatureFlagService], it renders the [onEnabled] widget.
 /// Otherwise, it renders the [onDisabled] widget.
 class FeatureToggle extends StatelessWidget {

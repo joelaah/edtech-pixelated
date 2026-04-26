@@ -49,11 +49,13 @@ void main() async {
     }
 
     print(
-        '🚀 Starting optimized upload of ${exams.length} exams to project: $projectId...');
+      '🚀 Starting optimized upload of ${exams.length} exams to project: $projectId...',
+    );
 
     for (int i = 0; i < exams.length; i++) {
-      final Map<String, dynamic> examData =
-          Map<String, dynamic>.from(exams[i] as Map<dynamic, dynamic>);
+      final Map<String, dynamic> examData = Map<String, dynamic>.from(
+        exams[i] as Map<dynamic, dynamic>,
+      );
       final String title = (examData['title'] as String?) ?? 'Untitled Exam';
 
       print('\n[${i + 1}/${exams.length}] Processing: $title');
@@ -66,20 +68,22 @@ void main() async {
         'durationMinutes',
         'questions',
       ];
-      final List<String> missingFields =
-          requiredFields.where((String f) => !examData.containsKey(f)).toList();
+      final List<String> missingFields = requiredFields
+          .where((String f) => !examData.containsKey(f))
+          .toList();
 
       if (missingFields.isNotEmpty) {
         print('   ⚠️ Skipping exam due to missing fields: $missingFields');
         continue;
       }
 
-      final List<dynamic> questions =
-          List<dynamic>.from(examData['questions'] as Iterable<dynamic>);
+      final List<dynamic> questions = List<dynamic>.from(
+        examData['questions'] as Iterable<dynamic>,
+      );
 
       // 2. Prepare Exam Document
-      final Map<String, dynamic> examDoc =
-          Map<String, dynamic>.from(examData)..remove('questions');
+      final Map<String, dynamic> examDoc = Map<String, dynamic>.from(examData)
+        ..remove('questions');
 
       // Ensure numeric types
       examDoc['durationMinutes'] = (examDoc['durationMinutes'] as num).toInt();
@@ -100,8 +104,9 @@ void main() async {
 
       // Add questions to batch
       for (final dynamic q in questions) {
-        final Map<String, dynamic> qData =
-            Map<String, dynamic>.from(q as Map<dynamic, dynamic>);
+        final Map<String, dynamic> qData = Map<String, dynamic>.from(
+          q as Map<dynamic, dynamic>,
+        );
         qData['points'] = (qData['points'] as num?)?.toInt() ?? 1;
         qData['order'] = (qData['order'] as num?)?.toInt() ?? 0;
 
@@ -110,7 +115,8 @@ void main() async {
       }
 
       print(
-          '   📤 Committing batch (1 exam + ${questions.length} questions)...');
+        '   📤 Committing batch (1 exam + ${questions.length} questions)...',
+      );
       await batch.commit();
       print('   ✅ Success! Document ID: ${examRef.id}');
     }

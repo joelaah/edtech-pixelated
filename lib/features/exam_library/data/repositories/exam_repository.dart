@@ -30,18 +30,15 @@ class ExamRepository with FirebaseGuardedExecution {
 
   /// Fetch all published exams (for students).
   Future<Result<List<ExamModel>>> fetchPublishedExams() async {
-    return guardedTask(
-      () async {
-        final QuerySnapshot<Map<String, dynamic>> snapshot =
-            await _examsCollection
-                .where('status', isEqualTo: 'published')
-                .orderBy('createdAt', descending: true)
-                .get();
+    return guardedTask(() async {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _examsCollection
+              .where('status', isEqualTo: 'published')
+              .orderBy('createdAt', descending: true)
+              .get();
 
-        return snapshot.docs.map(_mapDocToExam).toList();
-      },
-      taskName: 'fetchPublishedExams',
-    );
+      return snapshot.docs.map(_mapDocToExam).toList();
+    }, taskName: 'fetchPublishedExams');
   }
 
   /// Watch all published exams (for students).
@@ -60,53 +57,42 @@ class ExamRepository with FirebaseGuardedExecution {
 
   /// Fetch ALL exams regardless of status (for admins).
   Future<Result<List<ExamModel>>> fetchAllExams() async {
-    return guardedTask(
-      () async {
-        final QuerySnapshot<Map<String, dynamic>> snapshot =
-            await _examsCollection.orderBy('updatedAt', descending: true).get();
+    return guardedTask(() async {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _examsCollection.orderBy('updatedAt', descending: true).get();
 
-        return snapshot.docs.map(_mapDocToExam).toList();
-      },
-      taskName: 'fetchAllExams',
-    );
+      return snapshot.docs.map(_mapDocToExam).toList();
+    }, taskName: 'fetchAllExams');
   }
 
   /// Fetch a single exam by ID.
   Future<Result<ExamModel>> fetchExamById(String examId) async {
-    return guardedTask(
-      () async {
-        final DocumentSnapshot<Map<String, dynamic>> doc = await _examsCollection
-            .doc(examId)
-            .get();
-        if (!doc.exists || doc.data() == null) {
-          throw NotFoundException(
-            message: 'Exam not found: $examId',
-            code: 'exam-not-found',
-          );
-        }
-        return _mapDocToExam(doc);
-      },
-      taskName: 'fetchExamById',
-    );
+    return guardedTask(() async {
+      final DocumentSnapshot<Map<String, dynamic>> doc = await _examsCollection
+          .doc(examId)
+          .get();
+      if (!doc.exists || doc.data() == null) {
+        throw NotFoundException(
+          message: 'Exam not found: $examId',
+          code: 'exam-not-found',
+        );
+      }
+      return _mapDocToExam(doc);
+    }, taskName: 'fetchExamById');
   }
 
   /// Fetch all questions for an exam.
   Future<Result<List<QuestionModel>>> fetchQuestions(String examId) async {
-    return guardedTask(
-      () async {
-        final QuerySnapshot<Map<String, dynamic>> snapshot =
-            await _examsCollection
-                .doc(examId)
-                .collection('questions')
-                .orderBy('order')
-                .get();
+    return guardedTask(() async {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _examsCollection
+              .doc(examId)
+              .collection('questions')
+              .orderBy('order')
+              .get();
 
-        return snapshot.docs
-            .map(_mapDocToQuestion)
-            .toList();
-      },
-      taskName: 'fetchQuestions',
-    );
+      return snapshot.docs.map(_mapDocToQuestion).toList();
+    }, taskName: 'fetchQuestions');
   }
 
   // ── CREATE ──
@@ -125,47 +111,44 @@ class ExamRepository with FirebaseGuardedExecution {
     required int xpReward,
     File? attachmentFile,
   }) async {
-    return guardedTask(
-      () async {
-        final Map<String, dynamic> data = {
-          'title': title,
-          'description': description,
-          'subject': subject,
-          'difficultyTier': difficultyTier.firestoreValue,
-          'durationMinutes': durationMinutes,
-          'createdBy': createdBy,
-          'status': ExamStatus.draft.name,
-          'xpReward': xpReward,
-          'questionCount': 0,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        };
+    return guardedTask(() async {
+      final Map<String, dynamic> data = {
+        'title': title,
+        'description': description,
+        'subject': subject,
+        'difficultyTier': difficultyTier.firestoreValue,
+        'durationMinutes': durationMinutes,
+        'createdBy': createdBy,
+        'status': ExamStatus.draft.name,
+        'xpReward': xpReward,
+        'questionCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
 
-        final DocumentReference<Map<String, dynamic>> docRef =
-            await _examsCollection.add(data);
-        AppLogger.instance.i('Exam created: ${docRef.id}');
+      final DocumentReference<Map<String, dynamic>> docRef =
+          await _examsCollection.add(data);
+      AppLogger.instance.i('Exam created: ${docRef.id}');
 
-        // Upload attachment if provided
-        if (attachmentFile != null) {
-          final attachmentResult = await uploadExamFile(
-            examId: docRef.id,
-            file: attachmentFile,
-          );
-          switch (attachmentResult) {
-            case Success(:final data):
-              await docRef.update({'attachmentUrl': data});
-            case Failure(:final exception):
-              AppLogger.instance.w(
-                'Exam created but file upload failed: ${exception.message}',
-              );
-          }
+      // Upload attachment if provided
+      if (attachmentFile != null) {
+        final attachmentResult = await uploadExamFile(
+          examId: docRef.id,
+          file: attachmentFile,
+        );
+        switch (attachmentResult) {
+          case Success(:final data):
+            await docRef.update({'attachmentUrl': data});
+          case Failure(:final exception):
+            AppLogger.instance.w(
+              'Exam created but file upload failed: ${exception.message}',
+            );
         }
+      }
 
-        final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
-        return _mapDocToExam(doc);
-      },
-      taskName: 'createExam',
-    );
+      final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
+      return _mapDocToExam(doc);
+    }, taskName: 'createExam');
   }
 
   /// Uploads a file to Firebase Storage under `exam_assets/{examId}/`.
@@ -175,20 +158,17 @@ class ExamRepository with FirebaseGuardedExecution {
     required String examId,
     required File file,
   }) async {
-    return guardedTask(
-      () async {
-        final fileName =
-            'exam_${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
-        final storageRef = _storage.ref().child('exam_assets/$examId/$fileName');
+    return guardedTask(() async {
+      final fileName =
+          'exam_${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+      final storageRef = _storage.ref().child('exam_assets/$examId/$fileName');
 
-        final uploadTask = await storageRef.putFile(file);
-        final downloadUrl = await uploadTask.ref.getDownloadURL();
+      final uploadTask = await storageRef.putFile(file);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
 
-        AppLogger.instance.i('Exam file uploaded: $downloadUrl');
-        return downloadUrl;
-      },
-      taskName: 'uploadExamFile',
-    );
+      AppLogger.instance.i('Exam file uploaded: $downloadUrl');
+      return downloadUrl;
+    }, taskName: 'uploadExamFile');
   }
 
   /// Add a question to an exam (admin only).
@@ -202,33 +182,30 @@ class ExamRepository with FirebaseGuardedExecution {
     required int points,
     required int order,
   }) async {
-    return guardedTask(
-      () async {
-        final Map<String, dynamic> data = {
-          'questionText': questionText,
-          'questionType': questionType.firestoreValue,
-          'options': options,
-          'correctAnswer': correctAnswer,
-          'explanation': explanation,
-          'points': points,
-          'order': order,
-        };
+    return guardedTask(() async {
+      final Map<String, dynamic> data = {
+        'questionText': questionText,
+        'questionType': questionType.firestoreValue,
+        'options': options,
+        'correctAnswer': correctAnswer,
+        'explanation': explanation,
+        'points': points,
+        'order': order,
+      };
 
-        final DocumentReference<Map<String, dynamic>> docRef =
-            await _examsCollection.doc(examId).collection('questions').add(data);
+      final DocumentReference<Map<String, dynamic>> docRef =
+          await _examsCollection.doc(examId).collection('questions').add(data);
 
-        // Update question count on the exam
-        await _examsCollection.doc(examId).update({
-          'questionCount': FieldValue.increment(1),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+      // Update question count on the exam
+      await _examsCollection.doc(examId).update({
+        'questionCount': FieldValue.increment(1),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 
-        AppLogger.instance.i('Question added to exam $examId: ${docRef.id}');
-        final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
-        return _mapDocToQuestion(doc);
-      },
-      taskName: 'addQuestion',
-    );
+      AppLogger.instance.i('Question added to exam $examId: ${docRef.id}');
+      final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
+      return _mapDocToQuestion(doc);
+    }, taskName: 'addQuestion');
   }
 
   // ── UPDATE ──
@@ -238,17 +215,14 @@ class ExamRepository with FirebaseGuardedExecution {
     required String examId,
     Map<String, dynamic>? updates,
   }) async {
-    return guardedTask(
-      () async {
-        final Map<String, dynamic> data = {
-          ...?updates,
-          'updatedAt': FieldValue.serverTimestamp(),
-        };
-        await _examsCollection.doc(examId).update(data);
-        AppLogger.instance.i('Exam updated: $examId');
-      },
-      taskName: 'updateExam',
-    );
+    return guardedTask(() async {
+      final Map<String, dynamic> data = {
+        ...?updates,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      await _examsCollection.doc(examId).update(data);
+      AppLogger.instance.i('Exam updated: $examId');
+    }, taskName: 'updateExam');
   }
 
   /// Publish an exam (change status to published).
@@ -271,29 +245,26 @@ class ExamRepository with FirebaseGuardedExecution {
 
   /// Delete an exam and all its questions (admin only).
   Future<Result<void>> deleteExam(String examId) async {
-    return guardedTask(
-      () async {
-        // Delete questions sub-collection first
-        final QuerySnapshot<Map<String, dynamic>> questions =
-            await _examsCollection.doc(examId).collection('questions').get();
-        final WriteBatch batch = _firestore.batch();
-        for (final DocumentSnapshot<Map<String, dynamic>> doc in questions.docs) {
-          batch.delete(doc.reference);
-        }
-        batch.delete(_examsCollection.doc(examId));
-        await batch.commit();
+    return guardedTask(() async {
+      // Delete questions sub-collection first
+      final QuerySnapshot<Map<String, dynamic>> questions =
+          await _examsCollection.doc(examId).collection('questions').get();
+      final WriteBatch batch = _firestore.batch();
+      for (final DocumentSnapshot<Map<String, dynamic>> doc in questions.docs) {
+        batch.delete(doc.reference);
+      }
+      batch.delete(_examsCollection.doc(examId));
+      await batch.commit();
 
-        AppLogger.instance.i('Exam deleted: $examId');
-      },
-      taskName: 'deleteExam',
-    );
+      AppLogger.instance.i('Exam deleted: $examId');
+    }, taskName: 'deleteExam');
   }
 
   // ── Mappers ──
 
   ExamModel _mapDocToExam(DocumentSnapshot<Map<String, dynamic>> doc) {
     final Map<String, dynamic> data = doc.data()!;
-    
+
     DateTime parseDate(dynamic value) {
       if (value is Timestamp) return value.toDate();
       if (value is String) return DateTime.tryParse(value) ?? DateTime.now();

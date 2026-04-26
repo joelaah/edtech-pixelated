@@ -33,7 +33,10 @@ final class AnswerSelected extends AttemptEvent {
   final int questionIndex;
   final String selectedOption;
 
-  const AnswerSelected({required this.questionIndex, required this.selectedOption});
+  const AnswerSelected({
+    required this.questionIndex,
+    required this.selectedOption,
+  });
 
   @override
   List<Object?> get props => [questionIndex, selectedOption];
@@ -149,9 +152,9 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
   AttemptBloc({
     required AttemptRepository attemptRepository,
     required ExamRepository examRepository,
-  })  : _attemptRepository = attemptRepository,
-        _examRepository = examRepository,
-        super(const AttemptInitial()) {
+  }) : _attemptRepository = attemptRepository,
+       _examRepository = examRepository,
+       super(const AttemptInitial()) {
     on<StartAttemptRequested>(_onStartAttempt);
     on<AnswerSelected>(_onAnswerSelected);
     on<SubmitAttemptRequested>(_onSubmitAttempt);
@@ -175,21 +178,20 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
     // 2. Fetch questions
     final questionsResult = await _examRepository.fetchQuestions(event.examId);
     if (questionsResult is Failure<List<QuestionModel>>) {
-      emit(AttemptFailure(
-          message: (questionsResult as Failure).exception.message));
+      emit(
+        AttemptFailure(message: (questionsResult as Failure).exception.message),
+      );
       return;
     }
     final questions = (questionsResult as Success<List<QuestionModel>>).data;
 
     if (questions.isEmpty) {
-      emit(const AttemptFailure(
-          message: 'This exam has no questions yet.'));
+      emit(const AttemptFailure(message: 'This exam has no questions yet.'));
       return;
     }
 
     // 3. Calculate total points
-    final totalPoints =
-        questions.fold<int>(0, (sum, q) => sum + q.points);
+    final totalPoints = questions.fold<int>(0, (sum, q) => sum + q.points);
 
     // 4. Create attempt doc in Firestore
     final attemptResult = await _attemptRepository.startAttempt(
@@ -200,21 +202,20 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
 
     switch (attemptResult) {
       case Success(:final data):
-        emit(AttemptInProgress(
-          exam: exam,
-          questions: questions,
-          attempt: data,
-          selectedAnswers: const {},
-        ));
+        emit(
+          AttemptInProgress(
+            exam: exam,
+            questions: questions,
+            attempt: data,
+            selectedAnswers: const {},
+          ),
+        );
       case Failure(:final exception):
         emit(AttemptFailure(message: exception.message));
     }
   }
 
-  void _onAnswerSelected(
-    AnswerSelected event,
-    Emitter<AttemptState> emit,
-  ) {
+  void _onAnswerSelected(AnswerSelected event, Emitter<AttemptState> emit) {
     final currentState = state;
     if (currentState is! AttemptInProgress) return;
 
@@ -229,12 +230,14 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
       answer: event.selectedOption,
     );
 
-    emit(AttemptInProgress(
-      exam: currentState.exam,
-      questions: currentState.questions,
-      attempt: currentState.attempt,
-      selectedAnswers: updatedAnswers,
-    ));
+    emit(
+      AttemptInProgress(
+        exam: currentState.exam,
+        questions: currentState.questions,
+        attempt: currentState.attempt,
+        selectedAnswers: updatedAnswers,
+      ),
+    );
   }
 
   Future<void> _onSubmitAttempt(
@@ -263,10 +266,11 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
     final scorePercentage = currentState.questions.isNotEmpty
         ? (correctCount / currentState.questions.length) * 100
         : 0.0;
-    final xpEarned = (currentState.exam.xpReward *
-            (scorePercentage / 100) *
-            currentState.exam.difficultyTier.xpMultiplier)
-        .round();
+    final xpEarned =
+        (currentState.exam.xpReward *
+                (scorePercentage / 100) *
+                currentState.exam.difficultyTier.xpMultiplier)
+            .round();
 
     // Persist to Firestore
     final result = await _attemptRepository.completeAttempt(
@@ -277,12 +281,14 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
 
     switch (result) {
       case Success(:final data):
-        emit(AttemptCompleted(
-          exam: currentState.exam,
-          attempt: data,
-          correctCount: correctCount,
-          totalQuestions: currentState.questions.length,
-        ));
+        emit(
+          AttemptCompleted(
+            exam: currentState.exam,
+            attempt: data,
+            correctCount: correctCount,
+            totalQuestions: currentState.questions.length,
+          ),
+        );
       case Failure(:final exception):
         emit(AttemptFailure(message: exception.message));
     }
@@ -298,18 +304,21 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
 
     switch (result) {
       case Success(:final data):
-        final completed =
-            data.where((a) => a.status == AttemptStatus.completed).toList();
+        final completed = data
+            .where((a) => a.status == AttemptStatus.completed)
+            .toList();
         final averageScore = completed.isNotEmpty
             ? completed.fold<double>(0, (sum, a) => sum + a.scorePercentage) /
-                completed.length
+                  completed.length
             : 0.0;
 
-        emit(UserAttemptsLoaded(
-          attempts: data,
-          totalCompleted: completed.length,
-          averageScore: averageScore,
-        ));
+        emit(
+          UserAttemptsLoaded(
+            attempts: data,
+            totalCompleted: completed.length,
+            averageScore: averageScore,
+          ),
+        );
       case Failure(:final exception):
         emit(AttemptFailure(message: exception.message));
     }

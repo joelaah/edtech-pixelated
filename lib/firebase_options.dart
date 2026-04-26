@@ -70,8 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '410682798773',
     projectId: 'edtech-3f6fe',
     storageBucket: 'edtech-3f6fe.firebasestorage.app',
-    iosClientId: '410682798773-pghlg1d30lm1n8mvdtleob2rcr0jbn6d.apps.googleusercontent.com',
+    iosClientId:
+        '410682798773-pghlg1d30lm1n8mvdtleob2rcr0jbn6d.apps.googleusercontent.com',
     iosBundleId: 'com.bitwiseacademy.bitwiseAcademy',
   );
-
 }

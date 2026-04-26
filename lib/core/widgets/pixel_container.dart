@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// A retro 8-bit style container with "stepped" corners.
-/// 
-/// This widget uses a CustomPainter to draw a crisp, pixelated border 
+///
+/// This widget uses a CustomPainter to draw a crisp, pixelated border
 /// around any child widget, ensuring perfect scaling without jagged edges.
 class PixelContainer extends StatelessWidget {
   final Widget child;
@@ -77,8 +77,8 @@ class _PixelContainerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _PixelContainerPainter oldDelegate) {
-    return oldDelegate.backgroundColor != backgroundColor || 
-           oldDelegate.borderColor != borderColor ||
-           oldDelegate.pixelSize != pixelSize;
+    return oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.pixelSize != pixelSize;
   }
 }

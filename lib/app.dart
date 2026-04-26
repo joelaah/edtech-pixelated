@@ -46,9 +46,7 @@ class _RimsAppState extends State<RimsApp> {
         BlocProvider<ExamBloc>(
           create: (_) => getIt<ExamBloc>()..add(const LoadExamsRequested()),
         ),
-        BlocProvider<AttemptBloc>(
-          create: (_) => getIt<AttemptBloc>(),
-        ),
+        BlocProvider<AttemptBloc>(create: (_) => getIt<AttemptBloc>()),
       ],
       child: MaterialApp.router(
         title: 'RIMS',

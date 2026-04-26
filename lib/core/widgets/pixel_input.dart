@@ -66,38 +66,23 @@ class PixelInput extends StatelessWidget {
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(
-                color: AppColors.primary,
-                width: 4,
-              ),
+              borderSide: BorderSide(color: AppColors.primary, width: 4),
             ),
             enabledBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(
-                color: AppColors.primary,
-                width: 4,
-              ),
+              borderSide: BorderSide(color: AppColors.primary, width: 4),
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(
-                color: AppColors.secondary,
-                width: 4,
-              ),
+              borderSide: BorderSide(color: AppColors.secondary, width: 4),
             ),
             errorBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(
-                color: AppColors.error,
-                width: 4,
-              ),
+              borderSide: BorderSide(color: AppColors.error, width: 4),
             ),
             focusedErrorBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.zero,
-              borderSide: BorderSide(
-                color: AppColors.error,
-                width: 4,
-              ),
+              borderSide: BorderSide(color: AppColors.error, width: 4),
             ),
             suffixIcon: suffixIcon != null
                 ? Icon(

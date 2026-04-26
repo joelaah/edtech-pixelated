@@ -40,7 +40,12 @@ final class DashboardLoaded extends DashboardState {
   });
 
   @override
-  List<Object?> get props => [user, testsCompleted, averageScore, recentAttempts];
+  List<Object?> get props => [
+    user,
+    testsCompleted,
+    averageScore,
+    recentAttempts,
+  ];
 }
 
 final class DashboardError extends DashboardState {
@@ -66,54 +71,61 @@ class DashboardCubit extends Cubit<DashboardState> {
   DashboardCubit({
     required UserRepository userRepository,
     required AttemptRepository attemptRepository,
-  })  : _userRepository = userRepository,
-        _attemptRepository = attemptRepository,
-        super(const DashboardInitial());
+  }) : _userRepository = userRepository,
+       _attemptRepository = attemptRepository,
+       super(const DashboardInitial());
 
   /// Starts listening to the user profile stream and loads attempt stats.
   void loadDashboard(String userId) {
     emit(const DashboardLoading());
 
     _userSubscription?.cancel();
-    _userSubscription = _userRepository.watchUser(userId).listen(
-      (result) async {
-        switch (result) {
-          case Success(:final data):
-            // Fetch attempt stats whenever user profile updates
-            final statsResult =
-                await _attemptRepository.fetchUserAttempts(userId);
+    _userSubscription = _userRepository
+        .watchUser(userId)
+        .listen(
+          (result) async {
+            switch (result) {
+              case Success(:final data):
+                // Fetch attempt stats whenever user profile updates
+                final statsResult = await _attemptRepository.fetchUserAttempts(
+                  userId,
+                );
 
-            int testsCompleted = 0;
-            double averageScore = 0;
-            List<AttemptModel> recentAttempts = [];
+                int testsCompleted = 0;
+                double averageScore = 0;
+                List<AttemptModel> recentAttempts = [];
 
-            if (statsResult is Success<List<AttemptModel>>) {
-              final completed = statsResult.data
-                  .where((a) => a.status == AttemptStatus.completed)
-                  .toList();
-              testsCompleted = completed.length;
-              averageScore = completed.isNotEmpty
-                  ? completed.fold<double>(
-                          0, (sum, a) => sum + a.scorePercentage) /
-                      completed.length
-                  : 0.0;
-              recentAttempts = statsResult.data.take(5).toList();
+                if (statsResult is Success<List<AttemptModel>>) {
+                  final completed = statsResult.data
+                      .where((a) => a.status == AttemptStatus.completed)
+                      .toList();
+                  testsCompleted = completed.length;
+                  averageScore = completed.isNotEmpty
+                      ? completed.fold<double>(
+                              0,
+                              (sum, a) => sum + a.scorePercentage,
+                            ) /
+                            completed.length
+                      : 0.0;
+                  recentAttempts = statsResult.data.take(5).toList();
+                }
+
+                emit(
+                  DashboardLoaded(
+                    user: data,
+                    testsCompleted: testsCompleted,
+                    averageScore: averageScore,
+                    recentAttempts: recentAttempts,
+                  ),
+                );
+              case Failure(:final exception):
+                emit(DashboardError(message: exception.message));
             }
-
-            emit(DashboardLoaded(
-              user: data,
-              testsCompleted: testsCompleted,
-              averageScore: averageScore,
-              recentAttempts: recentAttempts,
-            ));
-          case Failure(:final exception):
-            emit(DashboardError(message: exception.message));
-        }
-      },
-      onError: (Object error) {
-        emit(DashboardError(message: error.toString()));
-      },
-    );
+          },
+          onError: (Object error) {
+            emit(DashboardError(message: error.toString()));
+          },
+        );
   }
 
   @override

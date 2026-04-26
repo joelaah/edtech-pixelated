@@ -84,15 +84,15 @@ class QuestionModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        questionText,
-        questionType,
-        options,
-        correctAnswer,
-        explanation,
-        points,
-        order,
-      ];
+    id,
+    questionText,
+    questionType,
+    options,
+    correctAnswer,
+    explanation,
+    points,
+    order,
+  ];
 }
 
 /// Question type matching Firestore field.

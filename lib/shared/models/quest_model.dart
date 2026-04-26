@@ -48,15 +48,15 @@ class QuestModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        type,
-        targetValue,
-        xpReward,
-        iconName,
-        isActive,
-      ];
+    id,
+    title,
+    description,
+    type,
+    targetValue,
+    xpReward,
+    iconName,
+    isActive,
+  ];
 }
 
 /// Quest type.

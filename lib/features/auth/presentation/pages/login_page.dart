@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,11 +42,11 @@ class _LoginPageState extends State<LoginPage> {
   void _onSignIn() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-            AuthSignInWithEmailRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+        AuthSignInWithEmailRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -71,9 +70,7 @@ class _LoginPageState extends State<LoginPage> {
             SnackBar(
               content: Text(
                 state.message,
-                style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.onError,
-                ),
+                style: AppTypography.bodyLg.copyWith(color: AppColors.onError),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -90,11 +87,7 @@ class _LoginPageState extends State<LoginPage> {
           body: Stack(
             children: [
               // ── Pixel grid background ──
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _PixelGridPainter(),
-                ),
-              ),
+              Positioned.fill(child: CustomPaint(painter: _PixelGridPainter())),
 
               // ── Floating pixel stars ──
               ..._buildStars(),
@@ -133,9 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: 0.03,
-                    child: CustomPaint(
-                      painter: _CrtScanlinePainter(),
-                    ),
+                    child: CustomPaint(painter: _CrtScanlinePainter()),
                   ),
                 ),
               ),
@@ -149,11 +140,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildBrandTitle() {
     return Column(
       children: [
-        Image.asset(
-          'logo/logo.png',
-          height: 120,
-          fit: BoxFit.contain,
-        ),
+        Image.asset('logo/logo.png', height: 120, fit: BoxFit.contain),
         const SizedBox(height: AppSpacing.md),
         Text(
           'RIMS',
@@ -163,10 +150,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 1.6,
             fontSize: 48,
             shadows: const [
-              Shadow(
-                offset: Offset(4, 4),
-                color: AppColors.primary,
-              ),
+              Shadow(offset: Offset(4, 4), color: AppColors.primary),
             ],
           ),
         ),
@@ -204,25 +188,13 @@ class _LoginPageState extends State<LoginPage> {
             color: AppColors.surfaceContainerLow,
             boxShadow: [
               // Top
-              BoxShadow(
-                offset: Offset(0, -4),
-                color: AppColors.onSurface,
-              ),
+              BoxShadow(offset: Offset(0, -4), color: AppColors.onSurface),
               // Bottom
-              BoxShadow(
-                offset: Offset(0, 4),
-                color: AppColors.onSurface,
-              ),
+              BoxShadow(offset: Offset(0, 4), color: AppColors.onSurface),
               // Left
-              BoxShadow(
-                offset: Offset(-4, 0),
-                color: AppColors.onSurface,
-              ),
+              BoxShadow(offset: Offset(-4, 0), color: AppColors.onSurface),
               // Right
-              BoxShadow(
-                offset: Offset(4, 0),
-                color: AppColors.onSurface,
-              ),
+              BoxShadow(offset: Offset(4, 0), color: AppColors.onSurface),
             ],
           ),
           child: Form(
@@ -306,19 +278,12 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       decoration: const BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.surfaceDim,
-            width: 4,
-          ),
+          bottom: BorderSide(color: AppColors.surfaceDim, width: 4),
         ),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.account_box,
-            size: 40,
-            color: AppColors.primary,
-          ),
+          const Icon(Icons.account_box, size: 40, color: AppColors.primary),
           const SizedBox(width: AppSpacing.md),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,9 +310,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(
-          child: Container(height: 2, color: AppColors.surfaceDim),
-        ),
+        Expanded(child: Container(height: 2, color: AppColors.surfaceDim)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Text(
@@ -358,9 +321,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        Expanded(
-          child: Container(height: 2, color: AppColors.surfaceDim),
-        ),
+        Expanded(child: Container(height: 2, color: AppColors.surfaceDim)),
       ],
     );
   }
@@ -375,10 +336,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHighest,
-                border: Border.all(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
+                border: Border.all(color: AppColors.primary, width: 4),
               ),
               child: Column(
                 children: [
@@ -409,10 +367,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHighest,
-                border: Border.all(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
+                border: Border.all(color: AppColors.primary, width: 4),
               ),
               child: Column(
                 children: [
@@ -520,10 +475,7 @@ class _CrtScanlinePainter extends CustomPainter {
       ..color = const Color(0xFF000000).withValues(alpha: 0.25);
 
     for (double y = 0; y < size.height; y += 4) {
-      canvas.drawRect(
-        Rect.fromLTWH(0, y + 2, size.width, 2),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(0, y + 2, size.width, 2), paint);
     }
   }
 

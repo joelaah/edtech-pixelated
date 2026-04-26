@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -81,7 +80,7 @@ GoRouter buildRouter(AuthBloc authBloc) {
       final AuthState authState = context.read<AuthBloc>().state;
       final bool isOnAuthPage =
           state.matchedLocation == RoutePaths.login ||
-              state.matchedLocation == RoutePaths.register;
+          state.matchedLocation == RoutePaths.register;
 
       // If authenticated and on an auth page, redirect to dashboard
       if (authState is AuthAuthenticated && isOnAuthPage) {
@@ -121,26 +120,18 @@ GoRouter buildRouter(AuthBloc authBloc) {
         path: RoutePaths.examTaking,
         name: 'examTaking',
         builder: (BuildContext context, GoRouterState state) =>
-            ExamTakingPage(
-          examId: state.pathParameters['examId'] ?? '',
-        ),
+            ExamTakingPage(examId: state.pathParameters['examId'] ?? ''),
       ),
       GoRoute(
         path: RoutePaths.examResults,
         name: 'examResults',
         builder: (BuildContext context, GoRouterState state) =>
-            ExamResultsPage(
-          examId: state.pathParameters['examId'] ?? '',
-        ),
+            ExamResultsPage(examId: state.pathParameters['examId'] ?? ''),
       ),
 
       // ── Main app shell (with bottom nav) ──
       ShellRoute(
-        builder: (
-          BuildContext context,
-          GoRouterState state,
-          Widget child,
-        ) =>
+        builder: (BuildContext context, GoRouterState state, Widget child) =>
             ShellScaffold(child: child),
         routes: <RouteBase>[
           GoRoute(
@@ -167,9 +158,7 @@ GoRouter buildRouter(AuthBloc authBloc) {
             path: RoutePaths.examDetail,
             name: 'examDetail',
             builder: (BuildContext context, GoRouterState state) =>
-                ExamDetailPage(
-              examId: state.pathParameters['examId'] ?? '',
-            ),
+                ExamDetailPage(examId: state.pathParameters['examId'] ?? ''),
           ),
           GoRoute(
             path: RoutePaths.quests,
@@ -182,20 +171,23 @@ GoRouter buildRouter(AuthBloc authBloc) {
             name: 'store',
             builder: (BuildContext context, GoRouterState state) =>
                 FeatureToggle(
-              flagName: 'show_pixel_storefront',
-              onEnabled: const Scaffold(
-                body: Center(
-                  child: Text(
-                    'New Pixel UI Coming Soon',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  flagName: 'show_pixel_storefront',
+                  onEnabled: const Scaffold(
+                    body: Center(
+                      child: Text(
+                        'New Pixel UI Coming Soon',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  onDisabled: BlocProvider(
+                    create: (_) => getIt<StoreCubit>()..loadSkins(),
+                    child: const AvatarStorePage(),
                   ),
                 ),
-              ),
-              onDisabled: BlocProvider(
-                create: (_) => getIt<StoreCubit>()..loadSkins(),
-                child: const AvatarStorePage(),
-              ),
-            ),
           ),
 
           // ── Admin routes (inside shell) ──
@@ -228,8 +220,8 @@ GoRouter buildRouter(AuthBloc authBloc) {
             name: 'adminCreateQuestions',
             builder: (BuildContext context, GoRouterState state) =>
                 CreateQuestionsPage(
-              examId: state.pathParameters['examId'] ?? '',
-            ),
+                  examId: state.pathParameters['examId'] ?? '',
+                ),
           ),
         ],
       ),

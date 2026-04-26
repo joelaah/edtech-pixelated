@@ -23,7 +23,7 @@ class AdminUploadSkinPage extends StatefulWidget {
 class _AdminUploadSkinPageState extends State<AdminUploadSkinPage> {
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
-  
+
   File? _selectedImage;
   bool _isUploading = false;
 
@@ -109,7 +109,9 @@ class _AdminUploadSkinPageState extends State<AdminUploadSkinPage> {
         ),
         title: Text(
           'UPLOAD PIXEL SKIN',
-          style: AppTypography.headlineXs.copyWith(color: AppColors.secondaryFixed),
+          style: AppTypography.headlineXs.copyWith(
+            color: AppColors.secondaryFixed,
+          ),
         ),
         centerTitle: true,
       ),
@@ -137,11 +139,17 @@ class _AdminUploadSkinPageState extends State<AdminUploadSkinPage> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.add_photo_alternate, size: 64, color: AppColors.primary),
+                          const Icon(
+                            Icons.add_photo_alternate,
+                            size: 64,
+                            color: AppColors.primary,
+                          ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             'TAP TO SELECT FILE',
-                            style: AppTypography.labelLg.copyWith(color: AppColors.primary),
+                            style: AppTypography.labelLg.copyWith(
+                              color: AppColors.primary,
+                            ),
                           ),
                         ],
                       ),
@@ -166,7 +174,9 @@ class _AdminUploadSkinPageState extends State<AdminUploadSkinPage> {
 
             // Submit Button
             if (_isUploading)
-              const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              )
             else
               PixelButton(
                 label: 'DEPLOY TO STORE',

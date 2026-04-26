@@ -20,8 +20,8 @@ class AuthRemoteDataSource {
   AuthRemoteDataSource({
     required fb.FirebaseAuth firebaseAuth,
     required GoogleSignIn googleSignIn,
-  })  : _firebaseAuth = firebaseAuth,
-        _googleSignIn = googleSignIn;
+  }) : _firebaseAuth = firebaseAuth,
+       _googleSignIn = googleSignIn;
 
   /// Returns the currently signed-in user, or `null`.
   fb.User? get currentUser => _firebaseAuth.currentUser;
@@ -35,11 +35,8 @@ class AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final fb.UserCredential credential =
-          await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final fb.UserCredential credential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
       AppLogger.instance.i('User signed in: ${credential.user?.uid}');
       return credential;
     } on fb.FirebaseAuthException catch (e, stackTrace) {
@@ -58,11 +55,8 @@ class AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final fb.UserCredential credential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final fb.UserCredential credential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
       AppLogger.instance.i('Account created: ${credential.user?.uid}');
       return credential;
     } on fb.FirebaseAuthException catch (e, stackTrace) {
@@ -98,8 +92,8 @@ class AuthRemoteDataSource {
         idToken: googleAuth.idToken,
       );
 
-      final fb.UserCredential userCredential =
-          await _firebaseAuth.signInWithCredential(credential);
+      final fb.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
       AppLogger.instance.i(
         'Google sign-in successful: ${userCredential.user?.uid}',
       );
@@ -132,13 +126,14 @@ class AuthRemoteDataSource {
         nonce: nonce,
       );
 
-      final fb.OAuthCredential credential = fb.OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken ?? '',
-        rawNonce: rawNonce,
-      );
+      final fb.OAuthCredential credential = fb.OAuthProvider('apple.com')
+          .credential(
+            idToken: appleCredential.identityToken ?? '',
+            rawNonce: rawNonce,
+          );
 
-      final fb.UserCredential userCredential =
-          await _firebaseAuth.signInWithCredential(credential);
+      final fb.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
       AppLogger.instance.i(
         'Apple sign-in successful: ${userCredential.user?.uid}',
       );
@@ -182,8 +177,10 @@ class AuthRemoteDataSource {
     const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   /// Returns the sha256 hash of [input] in hex format.
@@ -192,7 +189,6 @@ class AuthRemoteDataSource {
     final digest = sha256.convert(bytes);
     return digest.toString();
   }
-
 
   /// Send password reset email.
   Future<void> sendPasswordResetEmail({required String email}) async {
@@ -216,10 +212,7 @@ class AuthRemoteDataSource {
   /// Sign out from all providers.
   Future<void> signOut() async {
     try {
-      await Future.wait([
-        _firebaseAuth.signOut(),
-        _googleSignIn.signOut(),
-      ]);
+      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
       AppLogger.instance.i('User signed out');
     } on Exception catch (e, stackTrace) {
       AppLogger.instance.e('Sign out failed', error: e, stackTrace: stackTrace);

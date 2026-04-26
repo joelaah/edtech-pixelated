@@ -67,19 +67,19 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        uid,
-        email,
-        displayName,
-        role,
-        xp,
-        level,
-        coins,
-        streakDays,
-        avatarUrl,
-        unlockedAvatars,
-        createdAt,
-        lastLoginAt,
-      ];
+    uid,
+    email,
+    displayName,
+    role,
+    xp,
+    level,
+    coins,
+    streakDays,
+    avatarUrl,
+    unlockedAvatars,
+    createdAt,
+    lastLoginAt,
+  ];
 }
 
 /// User role enum matching Firestore role field.
