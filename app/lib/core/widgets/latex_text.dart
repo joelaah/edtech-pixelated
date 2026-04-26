@@ -31,9 +31,7 @@ class LatexText extends StatelessWidget {
 
   /// Returns true if [text] contains any LaTeX delimiters.
   static bool containsLatex(String text) {
-    return text.contains(r'$') ||
-        text.contains(r'\(') ||
-        text.contains(r'\[');
+    return text.contains(r'$') || text.contains(r'\(') || text.contains(r'\[');
   }
 
   @override
@@ -58,7 +56,8 @@ class LatexText extends StatelessWidget {
         mathStyle: segments.first.isBlock ? MathStyle.display : MathStyle.text,
         onErrorFallback: (error) => Text(
           segments.first.content,
-          style: style?.copyWith(color: Colors.red) ??
+          style:
+              style?.copyWith(color: Colors.red) ??
               const TextStyle(color: Colors.red),
         ),
       );
@@ -74,11 +73,11 @@ class LatexText extends StatelessWidget {
           return Math.tex(
             segment.content,
             textStyle: style,
-            mathStyle:
-                segment.isBlock ? MathStyle.display : MathStyle.text,
+            mathStyle: segment.isBlock ? MathStyle.display : MathStyle.text,
             onErrorFallback: (error) => Text(
               segment.content,
-              style: style?.copyWith(
+              style:
+                  style?.copyWith(
                     color: Colors.red,
                     fontStyle: FontStyle.italic,
                   ) ??
@@ -89,10 +88,7 @@ class LatexText extends StatelessWidget {
             ),
           );
         } else {
-          return Text(
-            segment.content,
-            style: style,
-          );
+          return Text(segment.content, style: style);
         }
       }).toList(),
     );
@@ -109,9 +105,7 @@ class LatexText extends StatelessWidget {
 
     while (i < input.length) {
       // Check for $$ (block math)
-      if (i < input.length - 1 &&
-          input[i] == r'$' &&
-          input[i + 1] == r'$') {
+      if (i < input.length - 1 && input[i] == r'$' && input[i + 1] == r'$') {
         // Flush text buffer
         if (buffer.isNotEmpty) {
           segments.add(_TextSegment(buffer.toString()));
@@ -124,19 +118,15 @@ class LatexText extends StatelessWidget {
           buffer.write(input.substring(i));
           break;
         }
-        segments.add(_TextSegment(
-          input.substring(i, end),
-          isLatex: true,
-          isBlock: true,
-        ));
+        segments.add(
+          _TextSegment(input.substring(i, end), isLatex: true, isBlock: true),
+        );
         i = end + 2;
         continue;
       }
 
       // Check for \[ (block math)
-      if (i < input.length - 1 &&
-          input[i] == r'\' &&
-          input[i + 1] == '[') {
+      if (i < input.length - 1 && input[i] == r'\' && input[i + 1] == '[') {
         if (buffer.isNotEmpty) {
           segments.add(_TextSegment(buffer.toString()));
           buffer.clear();
@@ -148,19 +138,15 @@ class LatexText extends StatelessWidget {
           buffer.write(input.substring(i));
           break;
         }
-        segments.add(_TextSegment(
-          input.substring(i, end),
-          isLatex: true,
-          isBlock: true,
-        ));
+        segments.add(
+          _TextSegment(input.substring(i, end), isLatex: true, isBlock: true),
+        );
         i = end + 2;
         continue;
       }
 
       // Check for \( (inline math)
-      if (i < input.length - 1 &&
-          input[i] == r'\' &&
-          input[i + 1] == '(') {
+      if (i < input.length - 1 && input[i] == r'\' && input[i + 1] == '(') {
         if (buffer.isNotEmpty) {
           segments.add(_TextSegment(buffer.toString()));
           buffer.clear();
@@ -172,10 +158,7 @@ class LatexText extends StatelessWidget {
           buffer.write(input.substring(i));
           break;
         }
-        segments.add(_TextSegment(
-          input.substring(i, end),
-          isLatex: true,
-        ));
+        segments.add(_TextSegment(input.substring(i, end), isLatex: true));
         i = end + 2;
         continue;
       }
@@ -193,10 +176,7 @@ class LatexText extends StatelessWidget {
           buffer.write(input.substring(i));
           break;
         }
-        segments.add(_TextSegment(
-          input.substring(i, end),
-          isLatex: true,
-        ));
+        segments.add(_TextSegment(input.substring(i, end), isLatex: true));
         i = end + 1;
         continue;
       }

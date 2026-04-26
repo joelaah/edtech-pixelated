@@ -113,10 +113,7 @@ final class QuestXpAwarding extends QuestState {
   final QuestModel quest;
   final QuestLoadSuccess previousState;
 
-  const QuestXpAwarding({
-    required this.quest,
-    required this.previousState,
-  });
+  const QuestXpAwarding({required this.quest, required this.previousState});
 
   @override
   List<Object?> get props => [quest, previousState];
@@ -138,7 +135,13 @@ final class QuestXpAwardSuccess extends QuestState {
   });
 
   @override
-  List<Object?> get props => [quest, xpAwarded, newLevel, updatedUser, previousState];
+  List<Object?> get props => [
+    quest,
+    xpAwarded,
+    newLevel,
+    updatedUser,
+    previousState,
+  ];
 }
 
 final class QuestXpAwardFailure extends QuestState {
@@ -166,9 +169,9 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
   QuestBloc({
     required QuestRepository questRepository,
     required UserRepository userRepository,
-  })  : _questRepository = questRepository,
-        _userRepository = userRepository,
-        super(const QuestInitial()) {
+  }) : _questRepository = questRepository,
+       _userRepository = userRepository,
+       super(const QuestInitial()) {
     on<LoadActiveQuestsRequested>(_onLoadActiveQuests);
     on<_ActiveQuestsUpdated>(_onActiveQuestsUpdated);
     on<_ActiveQuestsError>(_onActiveQuestsError);
@@ -182,16 +185,14 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
     emit(const QuestLoadInProgress());
 
     _questSubscription?.cancel();
-    _questSubscription = _questRepository.watchActiveQuests().listen(
-      (result) {
-        switch (result) {
-          case Success(:final data):
-            add(_ActiveQuestsUpdated(quests: data));
-          case Failure(:final exception):
-            add(_ActiveQuestsError(message: exception.message));
-        }
-      },
-    );
+    _questSubscription = _questRepository.watchActiveQuests().listen((result) {
+      switch (result) {
+        case Success(:final data):
+          add(_ActiveQuestsUpdated(quests: data));
+        case Failure(:final exception):
+          add(_ActiveQuestsError(message: exception.message));
+      }
+    });
   }
 
   void _onActiveQuestsUpdated(
@@ -199,13 +200,17 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
     Emitter<QuestState> emit,
   ) {
     final daily = event.quests.where((q) => q.type == QuestType.daily).toList();
-    final weekly = event.quests.where((q) => q.type == QuestType.weekly).toList();
+    final weekly = event.quests
+        .where((q) => q.type == QuestType.weekly)
+        .toList();
 
-    emit(QuestLoadSuccess(
-      dailyQuests: daily,
-      weeklyQuests: weekly,
-      completedQuestIds: const {},
-    ));
+    emit(
+      QuestLoadSuccess(
+        dailyQuests: daily,
+        weeklyQuests: weekly,
+        completedQuestIds: const {},
+      ),
+    );
   }
 
   void _onActiveQuestsError(
@@ -257,27 +262,33 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
       switch (result) {
         case Success<UserEntity>(:final data):
           final int newLevel = (data.xp ~/ 500) + 1;
-          emit(QuestXpAwardSuccess(
-            quest: quest,
-            xpAwarded: event.xpAmount,
-            newLevel: newLevel,
-            updatedUser: data,
-            previousState: prevState,
-          ));
+          emit(
+            QuestXpAwardSuccess(
+              quest: quest,
+              xpAwarded: event.xpAmount,
+              newLevel: newLevel,
+              updatedUser: data,
+              previousState: prevState,
+            ),
+          );
         case Failure<UserEntity>(:final exception):
-          emit(QuestXpAwardFailure(
-            quest: quest,
-            error: exception.message,
-            previousState: prevState,
-          ));
+          emit(
+            QuestXpAwardFailure(
+              quest: quest,
+              error: exception.message,
+              previousState: prevState,
+            ),
+          );
       }
     } catch (e) {
       AppLogger.instance.e('Award quest XP failed', error: e);
-      emit(QuestXpAwardFailure(
-        quest: quest,
-        error: e.toString(),
-        previousState: prevState,
-      ));
+      emit(
+        QuestXpAwardFailure(
+          quest: quest,
+          error: e.toString(),
+          previousState: prevState,
+        ),
+      );
     }
   }
 

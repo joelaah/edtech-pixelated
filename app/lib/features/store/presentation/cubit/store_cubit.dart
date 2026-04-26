@@ -28,15 +28,9 @@ final class StoreLoaded extends StoreState {
   final List<SkinModel> skins;
   final bool isPurchasing;
 
-  const StoreLoaded({
-    required this.skins,
-    this.isPurchasing = false,
-  });
+  const StoreLoaded({required this.skins, this.isPurchasing = false});
 
-  StoreLoaded copyWith({
-    List<SkinModel>? skins,
-    bool? isPurchasing,
-  }) {
+  StoreLoaded copyWith({List<SkinModel>? skins, bool? isPurchasing}) {
     return StoreLoaded(
       skins: skins ?? this.skins,
       isPurchasing: isPurchasing ?? this.isPurchasing,
@@ -70,9 +64,9 @@ class StoreCubit extends Cubit<StoreState> {
   StoreCubit({
     required StoreRepository storeRepository,
     required UserRepository userRepository,
-  })  : _storeRepository = storeRepository,
-        _userRepository = userRepository,
-        super(const StoreInitial());
+  }) : _storeRepository = storeRepository,
+       _userRepository = userRepository,
+       super(const StoreInitial());
 
   /// Subscribes to the real-time skins stream from Firestore.
   void loadSkins() {
@@ -132,10 +126,7 @@ class StoreCubit extends Cubit<StoreState> {
     required String uid,
     required String imageUrl,
   }) async {
-    return _userRepository.updateProfile(
-      uid: uid,
-      avatarUrl: imageUrl,
-    );
+    return _userRepository.updateProfile(uid: uid, avatarUrl: imageUrl);
   }
 
   @override

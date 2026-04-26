@@ -157,7 +157,11 @@ class _UserDashboardPageState extends State<UserDashboardPage>
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, int xp, {bool isAdmin = false}) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    int xp, {
+    bool isAdmin = false,
+  }) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: Container(
@@ -170,16 +174,10 @@ class _UserDashboardPageState extends State<UserDashboardPage>
         decoration: const BoxDecoration(
           color: AppColors.surface,
           border: Border(
-            bottom: BorderSide(
-              color: AppColors.primaryContainer,
-              width: 4,
-            ),
+            bottom: BorderSide(color: AppColors.primaryContainer, width: 4),
           ),
           boxShadow: [
-            BoxShadow(
-              offset: Offset(4, 4),
-              color: AppColors.shadowTinted,
-            ),
+            BoxShadow(offset: Offset(4, 4), color: AppColors.shadowTinted),
           ],
         ),
         child: Row(
@@ -187,11 +185,7 @@ class _UserDashboardPageState extends State<UserDashboardPage>
           children: [
             Row(
               children: [
-                Image.asset(
-                  'logo/logo.png',
-                  height: 32,
-                  fit: BoxFit.contain,
-                ),
+                Image.asset('logo/logo.png', height: 32, fit: BoxFit.contain),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'RIMS',
@@ -287,7 +281,9 @@ class _UserDashboardPageState extends State<UserDashboardPage>
                           TextButton(
                             onPressed: () {
                               Navigator.of(dialogContext).pop();
-                              context.read<AuthBloc>().add(const AuthSignOutRequested());
+                              context.read<AuthBloc>().add(
+                                const AuthSignOutRequested(),
+                              );
                             },
                             child: Text(
                               'LOGOUT',
@@ -325,7 +321,6 @@ class _UserDashboardPageState extends State<UserDashboardPage>
     );
   }
 
-
   Widget _buildHeroSection(
     BuildContext context, {
     required String userName,
@@ -340,146 +335,150 @@ class _UserDashboardPageState extends State<UserDashboardPage>
       children: [
         // ── Avatar / Mascot Panel ──
         Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
-                right: BorderSide(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
-              ),
-            ),
-            child: Column(
-              children: [
-                AnimatedBuilder(
-                  animation: _floatAnimation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, _floatAnimation.value),
-                      child: child,
-                    );
-                  },
-                  child: GestureDetector(
-                    onTap: () => context.go('/store'),
-                    child: Container(
-                      width: 96,
-                      height: 96,
-                      padding: hasCustomSkin ? const EdgeInsets.all(8) : EdgeInsets.zero,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryContainer,
-                        border: Border.all(
-                          color: AppColors.secondaryFixed,
-                          width: 4,
-                        ),
-                      ),
-                      child: hasCustomSkin
-                          ? CachedNetworkImage(
-                              imageUrl: user.avatarUrl!,
-                              fit: BoxFit.contain,
-                              filterQuality: FilterQuality.none, // Preserve pixel art
-                              placeholder: (context, url) => const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => const Icon(Icons.error),
-                            )
-                          : const Icon(
-                              Icons.smart_toy,
-                              size: 48,
-                              color: AppColors.secondaryFixed,
-                            ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                PixelButton(
-                  label: 'STORE',
-                  onPressed: () => context.go('/store'),
-                  isPrimary: false,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    'WELCOME BACK,',
-                    style: AppTypography.headlineXs.copyWith(
-                      color: AppColors.onSurface,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    userName.toUpperCase(),
-                    style: AppTypography.headlineXs.copyWith(
-                      color: AppColors.primary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
-                  color: AppColors.secondaryContainer,
-                  child: Text(
-                    'LVL $level',
-                    style: AppTypography.headlineXs.copyWith(
-                      color: AppColors.onSecondaryContainer,
-                    ),
-                  ),
-                ),
-              ],
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            border: Border(
+              bottom: BorderSide(color: AppColors.primary, width: 4),
+              right: BorderSide(color: AppColors.primary, width: 4),
             ),
           ),
+          child: Column(
+            children: [
+              AnimatedBuilder(
+                animation: _floatAnimation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(0, _floatAnimation.value),
+                    child: child,
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () => context.go('/store'),
+                  child: Container(
+                    width: 96,
+                    height: 96,
+                    padding: hasCustomSkin
+                        ? const EdgeInsets.all(8)
+                        : EdgeInsets.zero,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer,
+                      border: Border.all(
+                        color: AppColors.secondaryFixed,
+                        width: 4,
+                      ),
+                    ),
+                    child: hasCustomSkin
+                        ? CachedNetworkImage(
+                            imageUrl: user.avatarUrl!,
+                            fit: BoxFit.contain,
+                            filterQuality:
+                                FilterQuality.none, // Preserve pixel art
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          )
+                        : const Icon(
+                            Icons.smart_toy,
+                            size: 48,
+                            color: AppColors.secondaryFixed,
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              PixelButton(
+                label: 'STORE',
+                onPressed: () => context.go('/store'),
+                isPrimary: false,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'WELCOME BACK,',
+                  style: AppTypography.headlineXs.copyWith(
+                    color: AppColors.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  userName.toUpperCase(),
+                  style: AppTypography.headlineXs.copyWith(
+                    color: AppColors.primary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                color: AppColors.secondaryContainer,
+                child: Text(
+                  'LVL $level',
+                  style: AppTypography.headlineXs.copyWith(
+                    color: AppColors.onSecondaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
 
         const SizedBox(height: AppSpacing.md),
 
         // ── Daily Objective CTA ──
         PixelCard(
-            showShadow: true,
-            badge: 'DAILY OBJECTIVE',
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'MASTER THE\nMECHANICS',
-                  style: AppTypography.headlineSm.copyWith(
-                    color: AppColors.primary,
-                    height: 1.6,
-                  ),
+          showShadow: true,
+          badge: 'DAILY OBJECTIVE',
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'MASTER THE\nMECHANICS',
+                style: AppTypography.headlineSm.copyWith(
+                  color: AppColors.primary,
+                  height: 1.6,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  streakDays > 0
-                      ? 'Complete your daily mock test to maintain your $streakDays-day winning streak!'
-                      : 'Start your first mock test to begin building your streak!',
-                  style: AppTypography.bodyLg.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                streakDays > 0
+                    ? 'Complete your daily mock test to maintain your $streakDays-day winning streak!'
+                    : 'Start your first mock test to begin building your streak!',
+                style: AppTypography.bodyLg.copyWith(
+                  color: AppColors.onSurface,
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                PixelButton(
-                  label: 'TAKE MOCK TEST',
-                  icon: Icons.bolt,
-                  width: double.infinity,
-                  onPressed: () => context.go('/exams'),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              PixelButton(
+                label: 'TAKE MOCK TEST',
+                icon: Icons.bolt,
+                width: double.infinity,
+                onPressed: () => context.go('/exams'),
+              ),
+            ],
           ),
+        ),
       ],
     );
   }
 
-  Widget _buildStatsGrid(int xp, int level, int testsCompleted, double avgScore) {
+  Widget _buildStatsGrid(
+    int xp,
+    int level,
+    int testsCompleted,
+    double avgScore,
+  ) {
     // Compute XP progress within current level (500 XP per level)
     final int xpInLevel = xp % 500;
     final double xpProgress = xpInLevel / 500;
@@ -505,7 +504,9 @@ class _UserDashboardPageState extends State<UserDashboardPage>
               child: HpBar(
                 label: 'TESTS COMPLETED',
                 value: '$testsCompleted',
-                progress: testsCompleted > 0 ? (testsCompleted / 10).clamp(0.0, 1.0) : 0,
+                progress: testsCompleted > 0
+                    ? (testsCompleted / 10).clamp(0.0, 1.0)
+                    : 0,
                 variant: HpBarVariant.secondary,
               ),
             ),
@@ -530,120 +531,111 @@ class _UserDashboardPageState extends State<UserDashboardPage>
       children: [
         // ── Subject Grid ("Formula Game") ──
         Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              border: Border(
-                bottom: BorderSide(
-                  color: Color(0xFF101B34),
-                  width: 4,
-                ),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'SUBJECTS',
-                      style: AppTypography.headlineXs.copyWith(
-                        color: AppColors.onPrimary,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.videogame_asset,
-                      color: AppColors.secondaryFixed,
-                      size: 24,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                GridView.count(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: AppSpacing.md,
-                  mainAxisSpacing: AppSpacing.md,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _buildSubjectTile(Icons.functions, 'MATH'),
-                    _buildSubjectTile(Icons.science, 'PHYSICS'),
-                    _buildSubjectTile(Icons.biotech, 'CHEM'),
-                    _buildSubjectTile(Icons.code, 'CS'),
-                    _buildSubjectTile(Icons.history_edu, 'HISTORY'),
-                    _buildSubjectTile(Icons.public, 'GEO'),
-                  ],
-                ),
-              ],
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            border: Border(
+              bottom: BorderSide(color: Color(0xFF101B34), width: 4),
             ),
           ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'SUBJECTS',
+                    style: AppTypography.headlineXs.copyWith(
+                      color: AppColors.onPrimary,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.videogame_asset,
+                    color: AppColors.secondaryFixed,
+                    size: 24,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              GridView.count(
+                crossAxisCount: 3,
+                crossAxisSpacing: AppSpacing.md,
+                mainAxisSpacing: AppSpacing.md,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildSubjectTile(Icons.functions, 'MATH'),
+                  _buildSubjectTile(Icons.science, 'PHYSICS'),
+                  _buildSubjectTile(Icons.biotech, 'CHEM'),
+                  _buildSubjectTile(Icons.code, 'CS'),
+                  _buildSubjectTile(Icons.history_edu, 'HISTORY'),
+                  _buildSubjectTile(Icons.public, 'GEO'),
+                ],
+              ),
+            ],
+          ),
+        ),
 
         const SizedBox(height: AppSpacing.md),
 
         // ── Active Quests ──
         Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.7),
-              border: Border.all(
-                color: AppColors.outlineVariant,
-                width: 2,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  offset: Offset(4, 4),
-                  color: AppColors.shadowTinted,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: AppColors.surfaceContainerHighest,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    'ACTIVE QUESTS',
-                    style: AppTypography.headlineXs.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _buildQuestItem(
-                  icon: Icons.workspace_premium,
-                  title: 'FIRST STEPS',
-                  desc: 'Complete your first exam',
-                  iconColor: AppColors.secondary,
-                  bgColor: AppColors.secondaryContainer,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _buildQuestItem(
-                  icon: Icons.history_edu,
-                  title: 'STREAK STARTER',
-                  desc: 'Login 3 days in a row',
-                  iconColor: AppColors.tertiary,
-                  bgColor: AppColors.tertiaryFixed,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _buildQuestItem(
-                  icon: Icons.star,
-                  title: 'PERFECTIONIST',
-                  desc: 'Score 100% on any exam',
-                  iconColor: AppColors.primary,
-                  bgColor: AppColors.primaryFixed,
-                ),
-              ],
-            ),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.7),
+            border: Border.all(color: AppColors.outlineVariant, width: 2),
+            boxShadow: const [
+              BoxShadow(offset: Offset(4, 4), color: AppColors.shadowTinted),
+            ],
           ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppColors.surfaceContainerHighest,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  'ACTIVE QUESTS',
+                  style: AppTypography.headlineXs.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _buildQuestItem(
+                icon: Icons.workspace_premium,
+                title: 'FIRST STEPS',
+                desc: 'Complete your first exam',
+                iconColor: AppColors.secondary,
+                bgColor: AppColors.secondaryContainer,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _buildQuestItem(
+                icon: Icons.history_edu,
+                title: 'STREAK STARTER',
+                desc: 'Login 3 days in a row',
+                iconColor: AppColors.tertiary,
+                bgColor: AppColors.tertiaryFixed,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _buildQuestItem(
+                icon: Icons.star,
+                title: 'PERFECTIONIST',
+                desc: 'Score 100% on any exam',
+                iconColor: AppColors.primary,
+                bgColor: AppColors.primaryFixed,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -652,10 +644,7 @@ class _UserDashboardPageState extends State<UserDashboardPage>
     return Container(
       decoration: BoxDecoration(
         color: AppColors.primaryContainer,
-        border: Border.all(
-          color: AppColors.onPrimaryContainer,
-          width: 2,
-        ),
+        border: Border.all(color: AppColors.onPrimaryContainer, width: 2),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

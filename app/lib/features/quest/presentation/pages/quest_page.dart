@@ -35,7 +35,9 @@ class _QuestPageState extends State<QuestPage> {
           if (questState is QuestLoadInProgress) {
             return const Scaffold(
               backgroundColor: AppColors.surface,
-              body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              body: Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
             );
           }
 
@@ -48,10 +50,7 @@ class _QuestPageState extends State<QuestPage> {
                   margin: const EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceContainerHigh,
-                    border: Border.all(
-                      color: AppColors.error,
-                      width: 4,
-                    ),
+                    border: Border.all(color: AppColors.error, width: 4),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -146,7 +145,9 @@ class _QuestPageState extends State<QuestPage> {
                 final title = quest.title.toLowerCase();
                 if (title.contains('login') || title.contains('streak')) {
                   currentProgress = streakDays;
-                } else if (title.contains('test') || title.contains('exam') || title.contains('scholar')) {
+                } else if (title.contains('test') ||
+                    title.contains('exam') ||
+                    title.contains('scholar')) {
                   currentProgress = testsCompleted;
                 }
                 if (currentProgress >= quest.targetValue) {
@@ -154,11 +155,13 @@ class _QuestPageState extends State<QuestPage> {
                 }
               }
 
-              final Set<String> previouslyCompletedQuestIds = questState is QuestLoadSuccess
+              final Set<String> previouslyCompletedQuestIds =
+                  questState is QuestLoadSuccess
                   ? questState.completedQuestIds
                   : {};
 
-              final newlyCompletedQuestIds = currentlyCompletedQuestIds.difference(previouslyCompletedQuestIds);
+              final newlyCompletedQuestIds = currentlyCompletedQuestIds
+                  .difference(previouslyCompletedQuestIds);
 
               for (final questId in newlyCompletedQuestIds) {
                 QuestModel? quest;
@@ -169,11 +172,13 @@ class _QuestPageState extends State<QuestPage> {
                   }
                 }
                 if (quest != null && authState is AuthAuthenticated) {
-                  context.read<QuestBloc>().add(AwardQuestXp(
-                    uid: authState.user.uid,
-                    questId: quest.id,
-                    xpAmount: quest.xpReward,
-                  ));
+                  context.read<QuestBloc>().add(
+                    AwardQuestXp(
+                      uid: authState.user.uid,
+                      questId: quest.id,
+                      xpAmount: quest.xpReward,
+                    ),
+                  );
                 }
               }
 
@@ -240,31 +245,39 @@ class _QuestPageState extends State<QuestPage> {
                     if (dailyQuests.isEmpty)
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                          ),
                           child: Text(
                             'No daily missions available.',
-                            style: AppTypography.bodyLg.copyWith(color: AppColors.onSurfaceVariant),
+                            style: AppTypography.bodyLg.copyWith(
+                              color: AppColors.onSurfaceVariant,
+                            ),
                           ),
                         ),
                       )
                     else
                       SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                child: _buildLiveQuestCard(
-                                  quest: dailyQuests[index],
-                                  color: AppColors.secondary,
-                                  streakDays: streakDays,
-                                  testsCompleted: testsCompleted,
-                                ),
-                              );
-                            },
-                            childCount: dailyQuests.length,
-                          ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.sm,
+                              ),
+                              child: _buildLiveQuestCard(
+                                quest: dailyQuests[index],
+                                color: AppColors.secondary,
+                                streakDays: streakDays,
+                                testsCompleted: testsCompleted,
+                              ),
+                            );
+                          }, childCount: dailyQuests.length),
                         ),
                       ),
 
@@ -288,34 +301,44 @@ class _QuestPageState extends State<QuestPage> {
                     if (weeklyQuests.isEmpty)
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                          ),
                           child: Text(
                             'No weekly campaigns available.',
-                            style: AppTypography.bodyLg.copyWith(color: AppColors.onSurfaceVariant),
+                            style: AppTypography.bodyLg.copyWith(
+                              color: AppColors.onSurfaceVariant,
+                            ),
                           ),
                         ),
                       )
                     else
                       SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                child: _buildLiveQuestCard(
-                                  quest: weeklyQuests[index],
-                                  color: AppColors.tertiary,
-                                  streakDays: streakDays,
-                                  testsCompleted: testsCompleted,
-                                ),
-                              );
-                            },
-                            childCount: weeklyQuests.length,
-                          ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.sm,
+                              ),
+                              child: _buildLiveQuestCard(
+                                quest: weeklyQuests[index],
+                                color: AppColors.tertiary,
+                                streakDays: streakDays,
+                                testsCompleted: testsCompleted,
+                              ),
+                            );
+                          }, childCount: weeklyQuests.length),
                         ),
                       ),
-                    const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: AppSpacing.xxl),
+                    ),
                   ],
                 ),
               );
@@ -326,14 +349,20 @@ class _QuestPageState extends State<QuestPage> {
     );
   }
 
-  int _computeCompletions(List<QuestModel> quests, int streakDays, int testsCompleted) {
+  int _computeCompletions(
+    List<QuestModel> quests,
+    int streakDays,
+    int testsCompleted,
+  ) {
     int completed = 0;
     for (final quest in quests) {
       final title = quest.title.toLowerCase();
       int currentProgress = 0;
       if (title.contains('login') || title.contains('streak')) {
         currentProgress = streakDays;
-      } else if (title.contains('test') || title.contains('exam') || title.contains('scholar')) {
+      } else if (title.contains('test') ||
+          title.contains('exam') ||
+          title.contains('scholar')) {
         currentProgress = testsCompleted;
       }
       if (currentProgress >= quest.targetValue) {
@@ -355,11 +384,15 @@ class _QuestPageState extends State<QuestPage> {
 
     if (title.contains('login') || title.contains('streak')) {
       currentProgress = streakDays;
-    } else if (title.contains('test') || title.contains('exam') || title.contains('scholar')) {
+    } else if (title.contains('test') ||
+        title.contains('exam') ||
+        title.contains('scholar')) {
       currentProgress = testsCompleted;
     }
 
-    final double rawProgress = quest.targetValue > 0 ? currentProgress / quest.targetValue : 0;
+    final double rawProgress = quest.targetValue > 0
+        ? currentProgress / quest.targetValue
+        : 0;
     final double progress = rawProgress.clamp(0.0, 1.0);
     final bool isCompleted = progress >= 1.0;
 
@@ -368,7 +401,8 @@ class _QuestPageState extends State<QuestPage> {
     if (quest.iconName == 'bolt') iconData = Icons.bolt;
     if (quest.iconName == 'check_circle') iconData = Icons.check_circle;
     if (quest.iconName == 'quiz') iconData = Icons.quiz;
-    if (quest.iconName == 'local_fire_department') iconData = Icons.local_fire_department;
+    if (quest.iconName == 'local_fire_department')
+      iconData = Icons.local_fire_department;
     if (quest.iconName == 'school') iconData = Icons.school;
 
     return Container(
@@ -414,11 +448,10 @@ class _QuestPageState extends State<QuestPage> {
                     Text(
                       quest.title,
                       style: AppTypography.headlineXs.copyWith(
-                        color: isCompleted
-                            ? color
-                            : AppColors.onSurface,
-                        decoration:
-                            isCompleted ? TextDecoration.lineThrough : null,
+                        color: isCompleted ? color : AppColors.onSurface,
+                        decoration: isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     Text(

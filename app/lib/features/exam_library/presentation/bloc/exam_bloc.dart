@@ -68,10 +68,7 @@ final class ExamLoadSuccess extends ExamState {
   final List<ExamModel> exams;
   final String? activeSubjectFilter;
 
-  const ExamLoadSuccess({
-    required this.exams,
-    this.activeSubjectFilter,
-  });
+  const ExamLoadSuccess({required this.exams, this.activeSubjectFilter});
 
   @override
   List<Object?> get props => [exams, activeSubjectFilter];
@@ -94,8 +91,8 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
   StreamSubscription<Result<List<ExamModel>>>? _examsSubscription;
 
   ExamBloc({required ExamRepository examRepository})
-      : _examRepository = examRepository,
-        super(const ExamInitial()) {
+    : _examRepository = examRepository,
+      super(const ExamInitial()) {
     on<LoadExamsRequested>(_onLoadExamsRequested);
     on<_ExamsUpdated>(_onExamsUpdated);
     on<_ExamsError>(_onExamsError);
@@ -108,7 +105,7 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
     emit(const ExamLoadInProgress());
 
     await _examsSubscription?.cancel();
-    
+
     _examsSubscription = _examRepository.watchPublishedExams().listen(
       (result) {
         switch (result) {
@@ -126,16 +123,23 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
 
   void _onExamsUpdated(_ExamsUpdated event, Emitter<ExamState> emit) {
     List<ExamModel> filteredExams = event.exams;
-    if (event.activeSubjectFilter != null && event.activeSubjectFilter!.isNotEmpty) {
+    if (event.activeSubjectFilter != null &&
+        event.activeSubjectFilter!.isNotEmpty) {
       filteredExams = event.exams
-          .where((exam) => exam.subject.toUpperCase() == event.activeSubjectFilter!.toUpperCase())
+          .where(
+            (exam) =>
+                exam.subject.toUpperCase() ==
+                event.activeSubjectFilter!.toUpperCase(),
+          )
           .toList();
     }
 
-    emit(ExamLoadSuccess(
-      exams: filteredExams,
-      activeSubjectFilter: event.activeSubjectFilter,
-    ));
+    emit(
+      ExamLoadSuccess(
+        exams: filteredExams,
+        activeSubjectFilter: event.activeSubjectFilter,
+      ),
+    );
   }
 
   void _onExamsError(_ExamsError event, Emitter<ExamState> emit) {

@@ -70,9 +70,7 @@ class ShellScaffold extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? AppColors.secondary
-                        : Colors.transparent,
+                    color: isActive ? AppColors.secondary : Colors.transparent,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

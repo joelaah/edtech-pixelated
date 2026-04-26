@@ -39,12 +39,12 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-            AuthCreateAccountRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              displayName: _nameController.text.trim(),
-            ),
-          );
+        AuthCreateAccountRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          displayName: _nameController.text.trim(),
+        ),
+      );
     }
   }
 
@@ -60,9 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
             SnackBar(
               content: Text(
                 state.message,
-                style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.onError,
-                ),
+                style: AppTypography.bodyLg.copyWith(color: AppColors.onError),
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -79,11 +77,7 @@ class _RegisterPageState extends State<RegisterPage> {
           body: Stack(
             children: [
               // Pixel grid background
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _PixelGridPainter(),
-                ),
-              ),
+              Positioned.fill(child: CustomPaint(painter: _PixelGridPainter())),
 
               SafeArea(
                 child: Center(
@@ -133,8 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             clipBehavior: Clip.none,
                             children: [
                               Container(
-                                padding:
-                                    const EdgeInsets.all(AppSpacing.xl),
+                                padding: const EdgeInsets.all(AppSpacing.xl),
                                 decoration: const BoxDecoration(
                                   color: AppColors.surfaceContainerLow,
                                   boxShadow: [
@@ -187,26 +180,24 @@ class _RegisterPageState extends State<RegisterPage> {
                                             ),
                                             Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   'NEW RECRUIT',
                                                   style: AppTypography
                                                       .headlineSm
                                                       .copyWith(
-                                                    color:
-                                                        AppColors.primary,
-                                                  ),
+                                                        color:
+                                                            AppColors.primary,
+                                                      ),
                                                 ),
                                                 Text(
                                                   'CLASS SELECTION',
-                                                  style: AppTypography
-                                                      .bodyLg
+                                                  style: AppTypography.bodyLg
                                                       .copyWith(
-                                                    color: AppColors
-                                                        .onSurfaceVariant,
-                                                  ),
+                                                        color: AppColors
+                                                            .onSurfaceVariant,
+                                                      ),
                                                 ),
                                               ],
                                             ),
@@ -222,8 +213,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                         controller: _nameController,
                                         validator: (String? v) =>
                                             (v?.isEmpty ?? true)
-                                                ? 'Hero name required'
-                                                : null,
+                                            ? 'Hero name required'
+                                            : null,
                                       ),
                                       const SizedBox(height: AppSpacing.lg),
 
@@ -236,8 +227,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                             TextInputType.emailAddress,
                                         validator: (String? v) =>
                                             (v?.isEmpty ?? true)
-                                                ? 'Email required'
-                                                : null,
+                                            ? 'Email required'
+                                            : null,
                                       ),
                                       const SizedBox(height: AppSpacing.lg),
 
@@ -276,8 +267,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                       PixelButton(
                                         label: 'CREATE CHARACTER',
-                                        onPressed:
-                                            isLoading ? null : _onRegister,
+                                        onPressed: isLoading
+                                            ? null
+                                            : _onRegister,
                                         isLoading: isLoading,
                                         width: double.infinity,
                                       ),
@@ -332,8 +324,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             onTap: () => context.go('/login'),
                             child: Container(
                               width: double.infinity,
-                              padding:
-                                  const EdgeInsets.all(AppSpacing.md),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceContainerHighest,
                                 border: Border.all(
@@ -371,9 +362,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: 0.03,
-                    child: CustomPaint(
-                      painter: _CrtPainter(),
-                    ),
+                    child: CustomPaint(painter: _CrtPainter()),
                   ),
                 ),
               ),

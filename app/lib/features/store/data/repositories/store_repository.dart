@@ -43,27 +43,24 @@ class StoreRepository with FirebaseGuardedExecution {
     required String name,
     required int price,
   }) async {
-    return guardedTask(
-      () async {
-        // 1. Upload image to Firebase Storage
-        final fileName = 'skin_${DateTime.now().millisecondsSinceEpoch}.png';
-        final storageRef = _storage.ref().child('skins/$fileName');
+    return guardedTask(() async {
+      // 1. Upload image to Firebase Storage
+      final fileName = 'skin_${DateTime.now().millisecondsSinceEpoch}.png';
+      final storageRef = _storage.ref().child('skins/$fileName');
 
-        final uploadTask = await storageRef.putFile(imageFile);
-        final imageUrl = await uploadTask.ref.getDownloadURL();
+      final uploadTask = await storageRef.putFile(imageFile);
+      final imageUrl = await uploadTask.ref.getDownloadURL();
 
-        // 2. Save metadata to Firestore
-        final docRef = await _skinsCollection.add({
-          'name': name,
-          'price': price,
-          'imageUrl': imageUrl,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+      // 2. Save metadata to Firestore
+      final docRef = await _skinsCollection.add({
+        'name': name,
+        'price': price,
+        'imageUrl': imageUrl,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-        final newDoc = await docRef.get();
-        return SkinModel.fromFirestore(newDoc);
-      },
-      taskName: 'uploadSkin',
-    );
+      final newDoc = await docRef.get();
+      return SkinModel.fromFirestore(newDoc);
+    }, taskName: 'uploadSkin');
   }
 }

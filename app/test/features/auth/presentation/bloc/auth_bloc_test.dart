@@ -17,8 +17,9 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     // Stub authStateChanges before initializing AuthBloc
-    when(() => mockAuthRepository.authStateChanges)
-        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockAuthRepository.authStateChanges,
+    ).thenAnswer((_) => const Stream.empty());
     authBloc = AuthBloc(authRepository: mockAuthRepository);
   });
 
@@ -46,15 +47,13 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] when AuthCheckRequested succeeds',
       build: () {
-        when(() => mockAuthRepository.getCurrentUser())
-            .thenAnswer((_) async => Success(tUser));
+        when(
+          () => mockAuthRepository.getCurrentUser(),
+        ).thenAnswer((_) async => Success(tUser));
         return authBloc;
       },
       act: (bloc) => bloc.add(const AuthCheckRequested()),
-      expect: () => [
-        const AuthLoading(),
-        AuthAuthenticated(user: tUser),
-      ],
+      expect: () => [const AuthLoading(), AuthAuthenticated(user: tUser)],
       verify: (_) {
         verify(() => mockAuthRepository.getCurrentUser()).called(1);
       },
@@ -63,22 +62,21 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthUnauthenticated] when AuthCheckRequested returns null',
       build: () {
-        when(() => mockAuthRepository.getCurrentUser())
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockAuthRepository.getCurrentUser(),
+        ).thenAnswer((_) async => const Success(null));
         return authBloc;
       },
       act: (bloc) => bloc.add(const AuthCheckRequested()),
-      expect: () => const [
-        AuthLoading(),
-        AuthUnauthenticated(),
-      ],
+      expect: () => const [AuthLoading(), AuthUnauthenticated()],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthError] when AuthCheckRequested fails',
       build: () {
         when(() => mockAuthRepository.getCurrentUser()).thenAnswer(
-          (_) async => const Failure(AuthException(message: 'Error getting user')),
+          (_) async =>
+              const Failure(AuthException(message: 'Error getting user')),
         );
         return authBloc;
       },
@@ -92,37 +90,43 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] when AuthSignInWithEmailRequested succeeds',
       build: () {
-        when(() => mockAuthRepository.signInWithEmail(
-              email: 'test@example.com',
-              password: 'password123',
-            )).thenAnswer((_) async => Success(tUser));
+        when(
+          () => mockAuthRepository.signInWithEmail(
+            email: 'test@example.com',
+            password: 'password123',
+          ),
+        ).thenAnswer((_) async => Success(tUser));
         return authBloc;
       },
-      act: (bloc) => bloc.add(const AuthSignInWithEmailRequested(
-        email: 'test@example.com',
-        password: 'password123',
-      )),
-      expect: () => [
-        const AuthLoading(),
-        AuthAuthenticated(user: tUser),
-      ],
+      act: (bloc) => bloc.add(
+        const AuthSignInWithEmailRequested(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+      ),
+      expect: () => [const AuthLoading(), AuthAuthenticated(user: tUser)],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthError] when AuthSignInWithEmailRequested fails',
       build: () {
-        when(() => mockAuthRepository.signInWithEmail(
-              email: 'test@example.com',
-              password: 'password123',
-            )).thenAnswer(
-          (_) async => const Failure(AuthException(message: 'Invalid credentials')),
+        when(
+          () => mockAuthRepository.signInWithEmail(
+            email: 'test@example.com',
+            password: 'password123',
+          ),
+        ).thenAnswer(
+          (_) async =>
+              const Failure(AuthException(message: 'Invalid credentials')),
         );
         return authBloc;
       },
-      act: (bloc) => bloc.add(const AuthSignInWithEmailRequested(
-        email: 'test@example.com',
-        password: 'password123',
-      )),
+      act: (bloc) => bloc.add(
+        const AuthSignInWithEmailRequested(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+      ),
       expect: () => const [
         AuthLoading(),
         AuthError(message: 'Invalid credentials'),

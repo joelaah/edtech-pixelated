@@ -100,19 +100,24 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
         ),
         content: Text(
           'This will permanently delete "${exam.title}" and all its questions.',
-          style: AppTypography.bodyLg
-              .copyWith(color: AppColors.onSurfaceVariant),
+          style: AppTypography.bodyLg.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('CANCEL',
-                style: TextStyle(color: AppColors.onSurfaceVariant)),
+            child: const Text(
+              'CANCEL',
+              style: TextStyle(color: AppColors.onSurfaceVariant),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child:
-                const Text('DELETE', style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'DELETE',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
@@ -165,91 +170,95 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary))
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : _errorMessage != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            color: AppColors.error, size: 48),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          _errorMessage!,
-                          textAlign: TextAlign.center,
-                          style: AppTypography.bodyLg
-                              .copyWith(color: AppColors.error),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        ElevatedButton(
-                          onPressed: _loadExams,
-                          child: const Text('RETRY'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Filter row
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        _buildStatusFilter('ALL'),
-                        _buildStatusFilter('DRAFT'),
-                        _buildStatusFilter('PUBLISHED'),
-                        _buildStatusFilter('ARCHIVED'),
-                      ],
+                    const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                      size: 48,
                     ),
                     const SizedBox(height: AppSpacing.md),
-
-                    // Stats row
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      color: AppColors.surfaceContainerLowest,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildMiniStat(
-                              '${_exams.length}', 'TOTAL'),
-                          _buildMiniStat(
-                            '${_exams.where((e) => e.status == ExamStatus.published).length}',
-                            'PUBLISHED',
-                          ),
-                          _buildMiniStat(
-                            '${_exams.where((e) => e.status == ExamStatus.draft).length}',
-                            'DRAFTS',
-                          ),
-                        ],
+                    Text(
+                      _errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyLg.copyWith(
+                        color: AppColors.error,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-
-                    // Exam list
-                    if (_filteredExams.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.xxl),
-                          child: Text(
-                            'No exams found.',
-                            style: AppTypography.bodyLg.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      for (int i = 0; i < _filteredExams.length; i++) ...[
-                        _buildExamRow(_filteredExams[i]),
-                        if (i < _filteredExams.length - 1)
-                          const SizedBox(height: AppSpacing.sm),
-                      ],
+                    ElevatedButton(
+                      onPressed: _loadExams,
+                      child: const Text('RETRY'),
+                    ),
                   ],
                 ),
+              ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              children: [
+                // Filter row
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    _buildStatusFilter('ALL'),
+                    _buildStatusFilter('DRAFT'),
+                    _buildStatusFilter('PUBLISHED'),
+                    _buildStatusFilter('ARCHIVED'),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                // Stats row
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  color: AppColors.surfaceContainerLowest,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildMiniStat('${_exams.length}', 'TOTAL'),
+                      _buildMiniStat(
+                        '${_exams.where((e) => e.status == ExamStatus.published).length}',
+                        'PUBLISHED',
+                      ),
+                      _buildMiniStat(
+                        '${_exams.where((e) => e.status == ExamStatus.draft).length}',
+                        'DRAFTS',
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Exam list
+                if (_filteredExams.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xxl),
+                      child: Text(
+                        'No exams found.',
+                        style: AppTypography.bodyLg.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  for (int i = 0; i < _filteredExams.length; i++) ...[
+                    _buildExamRow(_filteredExams[i]),
+                    if (i < _filteredExams.length - 1)
+                      const SizedBox(height: AppSpacing.sm),
+                  ],
+              ],
+            ),
     );
   }
 
@@ -258,9 +267,7 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
       children: [
         Text(
           value,
-          style: AppTypography.headlineSm.copyWith(
-            color: AppColors.primary,
-          ),
+          style: AppTypography.headlineSm.copyWith(color: AppColors.primary),
         ),
         Text(
           label,
@@ -283,10 +290,7 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
         ),
         decoration: BoxDecoration(
           color: isActive ? AppColors.primary : Colors.transparent,
-          border: Border.all(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          border: Border.all(color: AppColors.primary, width: 2),
         ),
         child: Text(
           label,
@@ -391,8 +395,7 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                 'ADD Q',
                 Icons.add,
                 AppColors.primary,
-                () => context
-                    .go('/admin/exams/${exam.id}/questions'),
+                () => context.go('/admin/exams/${exam.id}/questions'),
               ),
               if (exam.status == ExamStatus.draft)
                 _buildActionChip(
@@ -434,9 +437,7 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
           horizontal: AppSpacing.sm,
           vertical: 4,
         ),
-        decoration: BoxDecoration(
-          border: Border.all(color: color, width: 2),
-        ),
+        decoration: BoxDecoration(border: Border.all(color: color, width: 2)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

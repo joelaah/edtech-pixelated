@@ -71,14 +71,17 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
 
             if (examState is ExamLoadInProgress) {
               return const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary));
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
             }
 
             if (exam == null) {
               return Center(
                 child: Text(
                   'MISSION DATA NOT FOUND',
-                  style: AppTypography.headlineMd.copyWith(color: AppColors.error),
+                  style: AppTypography.headlineMd.copyWith(
+                    color: AppColors.error,
+                  ),
                 ),
               );
             }
@@ -95,14 +98,8 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
                     decoration: const BoxDecoration(
                       color: AppColors.primary,
                       border: Border(
-                        bottom: BorderSide(
-                          color: Color(0xFF101B34),
-                          width: 8,
-                        ),
-                        right: BorderSide(
-                          color: Color(0xFF101B34),
-                          width: 8,
-                        ),
+                        bottom: BorderSide(color: Color(0xFF101B34), width: 8),
+                        right: BorderSide(color: Color(0xFF101B34), width: 8),
                       ),
                     ),
                     child: Column(
@@ -155,17 +152,26 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
                     children: [
                       Expanded(
                         child: _buildParamCard(
-                            Icons.quiz, 'QUESTIONS', '${exam.questionCount}'),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: _buildParamCard(Icons.timer, 'DURATION',
-                            '${exam.durationMinutes} MIN'),
+                          Icons.quiz,
+                          'QUESTIONS',
+                          '${exam.questionCount}',
+                        ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _buildParamCard(
-                            Icons.star, 'XP REWARD', '+${exam.xpReward}'),
+                          Icons.timer,
+                          'DURATION',
+                          '${exam.durationMinutes} MIN',
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: _buildParamCard(
+                          Icons.star,
+                          'XP REWARD',
+                          '+${exam.xpReward}',
+                        ),
                       ),
                     ],
                   ),
@@ -210,19 +216,23 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
                       final isLoading = attemptState is AttemptLoadInProgress;
                       return PixelButton(
                         label: isLoading ? 'INITIALIZING...' : 'BEGIN MISSION',
-                        icon: isLoading ? Icons.hourglass_empty : Icons.play_arrow,
+                        icon: isLoading
+                            ? Icons.hourglass_empty
+                            : Icons.play_arrow,
                         width: double.infinity,
                         onPressed: isLoading
                             ? () {}
                             : () {
-                                final authState = context.read<AuthBloc>().state;
+                                final authState = context
+                                    .read<AuthBloc>()
+                                    .state;
                                 if (authState is AuthAuthenticated) {
                                   context.read<AttemptBloc>().add(
-                                        StartAttemptRequested(
-                                          examId: widget.examId,
-                                          userId: authState.user.uid,
-                                        ),
-                                      );
+                                    StartAttemptRequested(
+                                      examId: widget.examId,
+                                      userId: authState.user.uid,
+                                    ),
+                                  );
                                 }
                               },
                       );
@@ -243,9 +253,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: const BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        border: Border(
-          bottom: BorderSide(color: AppColors.primary, width: 4),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.primary, width: 4)),
       ),
       child: Column(
         children: [
@@ -253,9 +261,7 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
           const SizedBox(height: AppSpacing.sm),
           Text(
             value,
-            style: AppTypography.headlineSm.copyWith(
-              color: AppColors.primary,
-            ),
+            style: AppTypography.headlineSm.copyWith(color: AppColors.primary),
           ),
           const SizedBox(height: 2),
           Text(

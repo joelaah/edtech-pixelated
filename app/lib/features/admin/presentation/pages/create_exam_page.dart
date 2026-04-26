@@ -117,9 +117,9 @@ class _CreateExamPageState extends State<CreateExamPage> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -179,22 +179,19 @@ class _CreateExamPageState extends State<CreateExamPage> {
             ),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
+                border: Border.all(color: AppColors.primary, width: 4),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _selectedSubject,
                   isExpanded: true,
-                  icon: const Icon(Icons.arrow_drop_down,
-                      color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: AppColors.primary,
+                  ),
                   style: AppTypography.bodyLg.copyWith(
                     fontSize: 24,
                     color: AppColors.onSurface,

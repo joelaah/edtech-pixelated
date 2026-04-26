@@ -13,7 +13,9 @@ import 'package:bitwise_academy/shared/models/user_entity.dart';
 ///
 /// Combines [AuthRemoteDataSource] (Firebase Auth) with
 /// [FirebaseFirestore] (user profile documents).
-class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository {
+class AuthRepositoryImpl
+    with FirebaseGuardedExecution
+    implements AuthRepository {
   final AuthRemoteDataSource _authDataSource;
   final FirebaseFirestore _firestore;
 
@@ -97,18 +99,15 @@ class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository
 
   @override
   Future<Result<UserEntity?>> getCurrentUser() async {
-    return guardedTask(
-      () async {
-        final firebaseUser = _authDataSource.currentUser;
-        if (firebaseUser == null) return null;
+    return guardedTask(() async {
+      final firebaseUser = _authDataSource.currentUser;
+      if (firebaseUser == null) return null;
 
-        final doc = await _usersCollection.doc(firebaseUser.uid).get();
-        if (!doc.exists || doc.data() == null) return null;
+      final doc = await _usersCollection.doc(firebaseUser.uid).get();
+      if (!doc.exists || doc.data() == null) return null;
 
-        return _mapDocToUser(doc);
-      },
-      taskName: 'getCurrentUser',
-    );
+      return _mapDocToUser(doc);
+    }, taskName: 'getCurrentUser');
   }
 
   @override
@@ -116,24 +115,21 @@ class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository
     required String email,
     required String password,
   }) async {
-    return guardedTask(
-      () async {
-        final credential = await _authDataSource.signInWithEmail(
-          email: email,
-          password: password,
-        );
-        final String uid = credential.user!.uid;
+    return guardedTask(() async {
+      final credential = await _authDataSource.signInWithEmail(
+        email: email,
+        password: password,
+      );
+      final String uid = credential.user!.uid;
 
-        // Update last login
-        await _usersCollection.doc(uid).update({
-          'lastLoginAt': FieldValue.serverTimestamp(),
-        });
+      // Update last login
+      await _usersCollection.doc(uid).update({
+        'lastLoginAt': FieldValue.serverTimestamp(),
+      });
 
-        final doc = await _usersCollection.doc(uid).get();
-        return _mapDocToUser(doc);
-      },
-      taskName: 'signInWithEmail',
-    );
+      final doc = await _usersCollection.doc(uid).get();
+      return _mapDocToUser(doc);
+    }, taskName: 'signInWithEmail');
   }
 
   @override
@@ -142,26 +138,126 @@ class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository
     required String password,
     required String displayName,
   }) async {
-    return guardedTask(
-      () async {
-        AppLogger.instance.d('🔵 [AUTH] Step 1: Creating Firebase Auth user...');
-        final credential = await _authDataSource.createAccountWithEmail(
-          email: email,
-          password: password,
+    return guardedTask(() async {
+      AppLogger.instance.d('🔵 [AUTH] Step 1: Creating Firebase Auth user...');
+      final credential = await _authDataSource.createAccountWithEmail(
+        email: email,
+        password: password,
+      );
+      final String uid = credential.user!.uid;
+      AppLogger.instance.d(
+        '🟢 [AUTH] Step 1 DONE: Auth user created with uid=$uid',
+      );
+
+      // Create user profile in Firestore (role defaults to student)
+      AppLogger.instance.d('🔵 [AUTH] Step 2: Checking admin whitelist...');
+      final bool isAdmin = await _isAdminWhitelisted(email);
+      AppLogger.instance.d('🟢 [AUTH] Step 2 DONE: isAdmin=$isAdmin');
+
+      final Map<String, dynamic> userData = {
+        'uid': uid,
+        'email': email,
+        'displayName': displayName,
+        'role': isAdmin ? UserRole.admin.name : UserRole.student.name,
+        'xp': 0,
+        'level': 1,
+        'streakDays': 0,
+        'avatarUrl': null,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastLoginAt': FieldValue.serverTimestamp(),
+      };
+
+      AppLogger.instance.d(
+        '🔵 [AUTH] Step 3: Ensuring auth state is established...',
+      );
+
+      // Ensure the client is authenticated before writing
+      final fb.User? current = _authDataSource.currentUser ?? credential.user;
+      final String? currentUidBefore = current?.uid;
+      if (currentUidBefore != uid) {
+        AppLogger.instance.d(
+          '🔶 Auth UID mismatch. Waiting for auth to settle...',
         );
-        final String uid = credential.user!.uid;
-        AppLogger.instance.d('🟢 [AUTH] Step 1 DONE: Auth user created with uid=$uid');
+        const timeout = Duration(seconds: 5);
+        const interval = Duration(milliseconds: 250);
+        var waited = Duration.zero;
+        while ((_authDataSource.currentUser == null ||
+                _authDataSource.currentUser!.uid != uid) &&
+            waited < timeout) {
+          await Future<void>.delayed(interval);
+          waited += interval;
+        }
+      }
 
-        // Create user profile in Firestore (role defaults to student)
-        AppLogger.instance.d('🔵 [AUTH] Step 2: Checking admin whitelist...');
-        final bool isAdmin = await _isAdminWhitelisted(email);
-        AppLogger.instance.d('🟢 [AUTH] Step 2 DONE: isAdmin=$isAdmin');
+      AppLogger.instance.d(
+        '🔵 [AUTH] Writing user to Firestore at users/$uid ...',
+      );
+      await _usersCollection.doc(uid).set(userData);
+      AppLogger.instance.d('🟢 [AUTH] Step 3 DONE: Firestore write succeeded!');
 
+      final doc = await _usersCollection.doc(uid).get();
+      return _mapDocToUser(doc);
+    }, taskName: 'createAccountWithEmail');
+  }
+
+  @override
+  Future<Result<UserEntity>> signInWithGoogle() async {
+    return guardedTask(() async {
+      final credential = await _authDataSource.signInWithGoogle();
+      final String uid = credential.user!.uid;
+
+      // Check if user profile exists; create if first-time
+      final DocumentSnapshot<Map<String, dynamic>> existingDoc =
+          await _usersCollection.doc(uid).get();
+
+      if (!existingDoc.exists) {
         final Map<String, dynamic> userData = {
           'uid': uid,
-          'email': email,
-          'displayName': displayName,
-          'role': isAdmin ? UserRole.admin.name : UserRole.student.name,
+          'email': credential.user!.email ?? '',
+          'displayName': credential.user!.displayName ?? 'HERO',
+          'role': await _isAdminWhitelisted(credential.user!.email ?? '')
+              ? UserRole.admin.name
+              : UserRole.student.name,
+          'xp': 0,
+          'level': 1,
+          'streakDays': 0,
+          'avatarUrl': credential.user!.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastLoginAt': FieldValue.serverTimestamp(),
+        };
+        await _usersCollection.doc(uid).set(userData);
+        AppLogger.instance.i('New Google user profile created: $uid');
+      } else {
+        await _usersCollection.doc(uid).update({
+          'lastLoginAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      final DocumentSnapshot<Map<String, dynamic>> doc = await _usersCollection
+          .doc(uid)
+          .get();
+      return _mapDocToUser(doc);
+    }, taskName: 'signInWithGoogle');
+  }
+
+  @override
+  Future<Result<UserEntity>> signInWithApple() async {
+    return guardedTask(() async {
+      final credential = await _authDataSource.signInWithApple();
+      final String uid = credential.user!.uid;
+
+      // Check if user profile exists; create if first-time
+      final DocumentSnapshot<Map<String, dynamic>> existingDoc =
+          await _usersCollection.doc(uid).get();
+
+      if (!existingDoc.exists) {
+        final Map<String, dynamic> userData = {
+          'uid': uid,
+          'email': credential.user!.email ?? '',
+          'displayName': credential.user!.displayName ?? 'HERO',
+          'role': await _isAdminWhitelisted(credential.user!.email ?? '')
+              ? UserRole.admin.name
+              : UserRole.student.name,
           'xp': 0,
           'level': 1,
           'streakDays': 0,
@@ -169,120 +265,19 @@ class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository
           'createdAt': FieldValue.serverTimestamp(),
           'lastLoginAt': FieldValue.serverTimestamp(),
         };
-
-        AppLogger.instance.d('🔵 [AUTH] Step 3: Ensuring auth state is established...');
-
-        // Ensure the client is authenticated before writing
-        final fb.User? current = _authDataSource.currentUser ?? credential.user;
-        final String? currentUidBefore = current?.uid;
-        if (currentUidBefore != uid) {
-          AppLogger.instance.d('🔶 Auth UID mismatch. Waiting for auth to settle...');
-          const timeout = Duration(seconds: 5);
-          const interval = Duration(milliseconds: 250);
-          var waited = Duration.zero;
-          while ((_authDataSource.currentUser == null ||
-                  _authDataSource.currentUser!.uid != uid) &&
-              waited < timeout) {
-            await Future<void>.delayed(interval);
-            waited += interval;
-          }
-        }
-
-        AppLogger.instance.d('🔵 [AUTH] Writing user to Firestore at users/$uid ...');
         await _usersCollection.doc(uid).set(userData);
-        AppLogger.instance.d('🟢 [AUTH] Step 3 DONE: Firestore write succeeded!');
+        AppLogger.instance.i('New Apple user profile created: $uid');
+      } else {
+        await _usersCollection.doc(uid).update({
+          'lastLoginAt': FieldValue.serverTimestamp(),
+        });
+      }
 
-        final doc = await _usersCollection.doc(uid).get();
-        return _mapDocToUser(doc);
-      },
-      taskName: 'createAccountWithEmail',
-    );
-  }
-
-  @override
-  Future<Result<UserEntity>> signInWithGoogle() async {
-    return guardedTask(
-      () async {
-        final credential = await _authDataSource.signInWithGoogle();
-        final String uid = credential.user!.uid;
-
-        // Check if user profile exists; create if first-time
-        final DocumentSnapshot<Map<String, dynamic>> existingDoc =
-            await _usersCollection.doc(uid).get();
-
-        if (!existingDoc.exists) {
-          final Map<String, dynamic> userData = {
-            'uid': uid,
-            'email': credential.user!.email ?? '',
-            'displayName': credential.user!.displayName ?? 'HERO',
-            'role': await _isAdminWhitelisted(credential.user!.email ?? '')
-                ? UserRole.admin.name
-                : UserRole.student.name,
-            'xp': 0,
-            'level': 1,
-            'streakDays': 0,
-            'avatarUrl': credential.user!.photoURL,
-            'createdAt': FieldValue.serverTimestamp(),
-            'lastLoginAt': FieldValue.serverTimestamp(),
-          };
-          await _usersCollection.doc(uid).set(userData);
-          AppLogger.instance.i('New Google user profile created: $uid');
-        } else {
-          await _usersCollection.doc(uid).update({
-            'lastLoginAt': FieldValue.serverTimestamp(),
-          });
-        }
-
-        final DocumentSnapshot<Map<String, dynamic>> doc = await _usersCollection
-            .doc(uid)
-            .get();
-        return _mapDocToUser(doc);
-      },
-      taskName: 'signInWithGoogle',
-    );
-  }
-
-  @override
-  Future<Result<UserEntity>> signInWithApple() async {
-    return guardedTask(
-      () async {
-        final credential = await _authDataSource.signInWithApple();
-        final String uid = credential.user!.uid;
-
-        // Check if user profile exists; create if first-time
-        final DocumentSnapshot<Map<String, dynamic>> existingDoc =
-            await _usersCollection.doc(uid).get();
-
-        if (!existingDoc.exists) {
-          final Map<String, dynamic> userData = {
-            'uid': uid,
-            'email': credential.user!.email ?? '',
-            'displayName': credential.user!.displayName ?? 'HERO',
-            'role': await _isAdminWhitelisted(credential.user!.email ?? '')
-                ? UserRole.admin.name
-                : UserRole.student.name,
-            'xp': 0,
-            'level': 1,
-            'streakDays': 0,
-            'avatarUrl': null,
-            'createdAt': FieldValue.serverTimestamp(),
-            'lastLoginAt': FieldValue.serverTimestamp(),
-          };
-          await _usersCollection.doc(uid).set(userData);
-          AppLogger.instance.i('New Apple user profile created: $uid');
-        } else {
-          await _usersCollection.doc(uid).update({
-            'lastLoginAt': FieldValue.serverTimestamp(),
-          });
-        }
-
-        final DocumentSnapshot<Map<String, dynamic>> doc = await _usersCollection
-            .doc(uid)
-            .get();
-        return _mapDocToUser(doc);
-      },
-      taskName: 'signInWithApple',
-    );
+      final DocumentSnapshot<Map<String, dynamic>> doc = await _usersCollection
+          .doc(uid)
+          .get();
+      return _mapDocToUser(doc);
+    }, taskName: 'signInWithApple');
   }
 
   @override
@@ -295,10 +290,7 @@ class AuthRepositoryImpl with FirebaseGuardedExecution implements AuthRepository
 
   @override
   Future<Result<void>> signOut() async {
-    return guardedTask(
-      () => _authDataSource.signOut(),
-      taskName: 'signOut',
-    );
+    return guardedTask(() => _authDataSource.signOut(), taskName: 'signOut');
   }
 
   /// Maps a Firestore document to [UserEntity].

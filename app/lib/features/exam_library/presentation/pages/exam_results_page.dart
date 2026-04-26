@@ -78,17 +78,20 @@ class _ExamResultsPageState extends State<ExamResultsPage>
     if (authState is AuthAuthenticated) {
       final userRepo = getIt<UserRepository>();
       final int coinsToAward = xpToAward ~/ 10;
-      
+
       await userRepo.awardXp(uid: authState.user.uid, xpAmount: xpToAward);
-      final updatedResult = await userRepo.awardCoins(uid: authState.user.uid, coinsAmount: coinsToAward);
-      
+      final updatedResult = await userRepo.awardCoins(
+        uid: authState.user.uid,
+        coinsAmount: coinsToAward,
+      );
+
       switch (updatedResult) {
         case Success(:final data):
-           if (mounted) {
-             context.read<AuthBloc>().add(AuthUserUpdated(user: data));
-           }
+          if (mounted) {
+            context.read<AuthBloc>().add(AuthUserUpdated(user: data));
+          }
         case Failure():
-           break;
+          break;
       }
     }
   }
@@ -222,10 +225,11 @@ class _ExamResultsPageState extends State<ExamResultsPage>
                                     builder: (context, child) {
                                       return Text(
                                         '+${_xpAnimation!.value}',
-                                        style: AppTypography.headlineMd.copyWith(
-                                          color: AppColors.tertiary,
-                                          fontSize: 48,
-                                        ),
+                                        style: AppTypography.headlineMd
+                                            .copyWith(
+                                              color: AppColors.tertiary,
+                                              fontSize: 48,
+                                            ),
                                       );
                                     },
                                   )

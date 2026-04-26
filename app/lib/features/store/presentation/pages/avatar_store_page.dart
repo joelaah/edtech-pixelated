@@ -45,7 +45,10 @@ class AvatarStorePage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   Text('Entering the Shop...', style: AppTypography.labelLg),
                   const SizedBox(height: AppSpacing.sm),
-                  Text('Preparing the collection for you', style: AppTypography.labelSm),
+                  Text(
+                    'Preparing the collection for you',
+                    style: AppTypography.labelSm,
+                  ),
                 ],
               ),
             );
@@ -56,7 +59,11 @@ class AvatarStorePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.lock_outline, size: 64, color: AppColors.error),
+                  const Icon(
+                    Icons.lock_outline,
+                    size: 64,
+                    color: AppColors.error,
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   const Text('Please log in to access the store.'),
                   const SizedBox(height: AppSpacing.md),
@@ -81,11 +88,17 @@ class AvatarStorePage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.monetization_on, color: Colors.amber, size: 32),
+                    const Icon(
+                      Icons.monetization_on,
+                      color: Colors.amber,
+                      size: 32,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       '${user.coins} COINS',
-                      style: AppTypography.headlineMd.copyWith(color: Colors.amber),
+                      style: AppTypography.headlineMd.copyWith(
+                        color: Colors.amber,
+                      ),
                     ),
                   ],
                 ),
@@ -96,91 +109,122 @@ class AvatarStorePage extends StatelessWidget {
                   builder: (context, storeState) {
                     return switch (storeState) {
                       StoreInitial() => Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const CircularProgressIndicator(),
-                              const SizedBox(height: AppSpacing.md),
-                              Text('Loading skins...', style: AppTypography.labelLg),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text('Browsing the vault...', style: AppTypography.labelMd),
-                            ],
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'Loading skins...',
+                              style: AppTypography.labelLg,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'Browsing the vault...',
+                              style: AppTypography.labelMd,
+                            ),
+                          ],
                         ),
+                      ),
                       StoreError(:final message) => Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.shopping_bag_outlined, size: 48, color: AppColors.error),
-                              const SizedBox(height: AppSpacing.md),
-                              Text(
-                                'The shop is closed for maintenance',
-                                style: AppTypography.headlineSm.copyWith(color: AppColors.error),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 48,
+                              color: AppColors.error,
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'The shop is closed for maintenance',
+                              style: AppTypography.headlineSm.copyWith(
+                                color: AppColors.error,
                               ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                message,
-                                style: AppTypography.labelMd,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: AppSpacing.lg),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              message,
+                              style: AppTypography.labelMd,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
                         ),
-                      StoreLoaded(:final skins, :final isPurchasing) => skins.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                      StoreLoaded(:final skins, :final isPurchasing) =>
+                        skins.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'NO SKINS AVAILABLE',
+                                      style: AppTypography.headlineSm.copyWith(
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                  ],
+                                ),
+                              )
+                            : Stack(
                                 children: [
-                                  Text(
-                                    'NO SKINS AVAILABLE',
-                                    style: AppTypography.headlineSm.copyWith(color: AppColors.onSurfaceVariant),
+                                  GridView.builder(
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.md,
+                                    ),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          childAspectRatio: 0.70,
+                                          crossAxisSpacing: AppSpacing.md,
+                                          mainAxisSpacing: AppSpacing.md,
+                                        ),
+                                    itemCount: skins.length,
+                                    itemBuilder: (context, index) {
+                                      final skin = skins[index];
+                                      final isUnlocked = user.unlockedAvatars
+                                          .contains(skin.id);
+                                      final isEquipped =
+                                          user.avatarUrl == skin.imageUrl;
+
+                                      return _SkinCard(
+                                        skin: skin,
+                                        isUnlocked: isUnlocked,
+                                        isEquipped: isEquipped,
+                                        canAfford: user.coins >= skin.price,
+                                        onTap: () {
+                                          if (isEquipped || isPurchasing)
+                                            return;
+                                          if (isUnlocked) {
+                                            _handleEquip(
+                                              context,
+                                              user.uid,
+                                              skin,
+                                            );
+                                          } else {
+                                            _handlePurchase(
+                                              context,
+                                              user.uid,
+                                              skin,
+                                            );
+                                          }
+                                        },
+                                      );
+                                    },
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
+                                  if (isPurchasing)
+                                    const Positioned.fill(
+                                      child: ColoredBox(
+                                        color: Colors.black26,
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
-                            )
-                          : Stack(
-                              children: [
-                                GridView.builder(
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 0.70,
-                                    crossAxisSpacing: AppSpacing.md,
-                                    mainAxisSpacing: AppSpacing.md,
-                                  ),
-                                  itemCount: skins.length,
-                                  itemBuilder: (context, index) {
-                                    final skin = skins[index];
-                                    final isUnlocked = user.unlockedAvatars.contains(skin.id);
-                                    final isEquipped = user.avatarUrl == skin.imageUrl;
-
-                                    return _SkinCard(
-                                      skin: skin,
-                                      isUnlocked: isUnlocked,
-                                      isEquipped: isEquipped,
-                                      canAfford: user.coins >= skin.price,
-                                      onTap: () {
-                                        if (isEquipped || isPurchasing) return;
-                                        if (isUnlocked) {
-                                          _handleEquip(context, user.uid, skin);
-                                        } else {
-                                          _handlePurchase(context, user.uid, skin);
-                                        }
-                                      },
-                                    );
-                                  },
-                                ),
-                                if (isPurchasing)
-                                  const Positioned.fill(
-                                    child: ColoredBox(
-                                      color: Colors.black26,
-                                      child: Center(child: CircularProgressIndicator()),
-                                    ),
-                                  ),
-                              ],
-                            ),
                     };
                   },
                 ),
@@ -283,22 +327,42 @@ class _SkinCard extends StatelessWidget {
                       imageUrl: skin.imageUrl,
                       fit: BoxFit.contain,
                       filterQuality: FilterQuality.none, // Preserve pixel art
-                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                     )
                   : ColorFiltered(
                       colorFilter: const ColorFilter.matrix([
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0.2126, 0.7152, 0.0722, 0, 0,
-                        0,      0,      0,      1, 0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0.2126,
+                        0.7152,
+                        0.0722,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
                       ]),
                       child: CachedNetworkImage(
                         imageUrl: skin.imageUrl,
                         fit: BoxFit.contain,
                         filterQuality: FilterQuality.none,
-                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
             ),
@@ -321,7 +385,9 @@ class _SkinCard extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.md),
               child: Text(
                 'EQUIPPED',
-                style: AppTypography.labelSm.copyWith(color: AppColors.onSecondary),
+                style: AppTypography.labelSm.copyWith(
+                  color: AppColors.onSecondary,
+                ),
               ),
             )
           else if (isUnlocked)

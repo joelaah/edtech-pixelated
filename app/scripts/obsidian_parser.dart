@@ -46,12 +46,13 @@ void main(List<String> args) {
     exit(1);
   }
 
-  final mdFiles = inputDir
-      .listSync()
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.md'))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final mdFiles =
+      inputDir
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.md'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
 
   if (mdFiles.isEmpty) {
     print('⚠️  No .md files found in "${args[0]}".');
@@ -298,7 +299,9 @@ List<Map<String, dynamic>> _parseQuestions(String questionsBody) {
 
     // Get the content between this header and the next (or end)
     final start = match.end;
-    final end = i + 1 < matches.length ? matches[i + 1].start : questionsBody.length;
+    final end = i + 1 < matches.length
+        ? matches[i + 1].start
+        : questionsBody.length;
     final block = questionsBody.substring(start, end).trim();
 
     final question = _parseSingleQuestion(block, qNumber);
@@ -355,7 +358,9 @@ Map<String, dynamic> _parseSingleQuestion(String block, int order) {
     }
 
     // Check for blockquote explanation: > **Explanation:** ...
-    final explanationMatch = RegExp(r'^\s*>\s*\*?\*?Explanation:?\*?\*?\s*(.+)$').firstMatch(line);
+    final explanationMatch = RegExp(
+      r'^\s*>\s*\*?\*?Explanation:?\*?\*?\s*(.+)$',
+    ).firstMatch(line);
     if (explanationMatch != null) {
       explanation = explanationMatch.group(1)!.trim();
       continue;

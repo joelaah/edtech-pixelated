@@ -64,9 +64,7 @@ class QuestionView extends StatelessWidget {
         // ── Options Header ──
         Text(
           showResult ? 'ANSWERS:' : 'SELECT ANSWER:',
-          style: AppTypography.headlineXs.copyWith(
-            color: AppColors.primary,
-          ),
+          style: AppTypography.headlineXs.copyWith(color: AppColors.primary),
         ),
         const SizedBox(height: AppSpacing.md),
 
@@ -224,10 +222,7 @@ class QuestionView extends StatelessWidget {
                 color: (isSelected || (showResult && isCorrect))
                     ? borderColor
                     : AppColors.surfaceContainerHigh,
-                border: Border.all(
-                  color: borderColor,
-                  width: 2,
-                ),
+                border: Border.all(color: borderColor, width: 2),
               ),
               child: Center(
                 child: AnimatedDefaultTextStyle(
@@ -252,7 +247,11 @@ class QuestionView extends StatelessWidget {
 
             // Result icon
             if (showResult && isCorrect)
-              const Icon(Icons.check_circle, color: AppColors.secondary, size: 24)
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.secondary,
+                size: 24,
+              )
             else if (showResult && isSelected && !isCorrect)
               const Icon(Icons.cancel, color: AppColors.error, size: 24),
           ],

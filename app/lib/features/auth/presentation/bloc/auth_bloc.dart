@@ -134,8 +134,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   StreamSubscription<UserEntity?>? _authSubscription;
 
   AuthBloc({required AuthRepository authRepository})
-      : _authRepository = authRepository,
-        super(const AuthInitial()) {
+    : _authRepository = authRepository,
+      super(const AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthSignInWithEmailRequested>(_onSignInWithEmail);
     on<AuthCreateAccountRequested>(_onCreateAccount);
@@ -151,10 +151,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  void _onUserChanged(
-    _AuthUserChanged event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onUserChanged(_AuthUserChanged event, Emitter<AuthState> emit) {
     if (event.user != null) {
       emit(AuthAuthenticated(user: event.user!));
     } else {
@@ -162,10 +159,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onUserUpdated(
-    AuthUserUpdated event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onUserUpdated(AuthUserUpdated event, Emitter<AuthState> emit) {
     emit(AuthAuthenticated(user: event.user));
   }
 
@@ -209,12 +203,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
-    final Result<UserEntity> result =
-        await _authRepository.createAccountWithEmail(
-      email: event.email,
-      password: event.password,
-      displayName: event.displayName,
-    );
+    final Result<UserEntity> result = await _authRepository
+        .createAccountWithEmail(
+          email: event.email,
+          password: event.password,
+          displayName: event.displayName,
+        );
     switch (result) {
       case Success(:final data):
         emit(AuthAuthenticated(user: data));

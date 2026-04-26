@@ -63,17 +63,17 @@ class AttemptModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        examId,
-        startedAt,
-        completedAt,
-        score,
-        totalPoints,
-        xpEarned,
-        status,
-        answers,
-      ];
+    id,
+    userId,
+    examId,
+    startedAt,
+    completedAt,
+    score,
+    totalPoints,
+    xpEarned,
+    status,
+    answers,
+  ];
 }
 
 /// Attempt lifecycle status.

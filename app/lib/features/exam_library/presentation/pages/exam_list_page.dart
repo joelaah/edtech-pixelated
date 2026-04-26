@@ -62,7 +62,12 @@ class ExamListPage extends StatelessWidget {
                         const SizedBox(width: AppSpacing.sm),
                         _buildFilterChip(context, 'PHYSICS', 'PHYSICS', state),
                         const SizedBox(width: AppSpacing.sm),
-                        _buildFilterChip(context, 'CHEMISTRY', 'CHEMISTRY', state),
+                        _buildFilterChip(
+                          context,
+                          'CHEMISTRY',
+                          'CHEMISTRY',
+                          state,
+                        ),
                         const SizedBox(width: AppSpacing.sm),
                         _buildFilterChip(context, 'CS', 'CS', state),
                       ],
@@ -110,7 +115,9 @@ class ExamListPage extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Text(
                 'NO EXAMS FOUND FOR THIS SUBJECT.',
-                style: AppTypography.headlineXs.copyWith(color: AppColors.onSurfaceVariant),
+                style: AppTypography.headlineXs.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
             ),
           ),
@@ -118,26 +125,23 @@ class ExamListPage extends StatelessWidget {
       }
 
       return SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final exam = state.exams[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: _buildExamCard(
-                context,
-                examId: exam.id,
-                title: exam.title,
-                subject: exam.subject,
-                difficulty: exam.difficultyTier.displayName,
-                difficultyColor: _getDifficultyColor(exam.difficultyTier),
-                questions: exam.questionCount,
-                duration: exam.durationMinutes,
-                xp: exam.xpReward,
-              ),
-            );
-          },
-          childCount: state.exams.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final exam = state.exams[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _buildExamCard(
+              context,
+              examId: exam.id,
+              title: exam.title,
+              subject: exam.subject,
+              difficulty: exam.difficultyTier.displayName,
+              difficultyColor: _getDifficultyColor(exam.difficultyTier),
+              questions: exam.questionCount,
+              duration: exam.durationMinutes,
+              xp: exam.xpReward,
+            ),
+          );
+        }, childCount: state.exams.length),
       );
     }
 
@@ -153,7 +157,12 @@ class ExamListPage extends StatelessWidget {
     };
   }
 
-  Widget _buildFilterChip(BuildContext context, String label, String? filterValue, ExamState state) {
+  Widget _buildFilterChip(
+    BuildContext context,
+    String label,
+    String? filterValue,
+    ExamState state,
+  ) {
     bool isActive = false;
     if (state is ExamLoadSuccess) {
       isActive = state.activeSubjectFilter == filterValue;
@@ -163,7 +172,9 @@ class ExamListPage extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        context.read<ExamBloc>().add(LoadExamsRequested(subjectFilter: filterValue));
+        context.read<ExamBloc>().add(
+          LoadExamsRequested(subjectFilter: filterValue),
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -171,16 +182,17 @@ class ExamListPage extends StatelessWidget {
           vertical: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary : AppColors.surfaceContainerHighest,
-          border: Border.all(
-            color: AppColors.primary,
-            width: 2,
-          ),
+          color: isActive
+              ? AppColors.primary
+              : AppColors.surfaceContainerHighest,
+          border: Border.all(color: AppColors.primary, width: 2),
         ),
         child: Text(
           label,
           style: AppTypography.headlineXs.copyWith(
-            color: isActive ? AppColors.secondaryFixed : AppColors.onSurfaceVariant,
+            color: isActive
+                ? AppColors.secondaryFixed
+                : AppColors.onSurfaceVariant,
           ),
         ),
       ),

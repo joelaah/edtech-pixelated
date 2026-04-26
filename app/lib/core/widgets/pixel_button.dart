@@ -49,7 +49,7 @@ class _PixelButtonState extends State<PixelButton> {
   /// 2. Explicitly provided [backgroundColor]
   /// 3. Primary vs Secondary theme defaults
   Color get _effectiveBackgroundColor {
-    if (_isDisabled && !widget.isLoading) return const Color(0xFFD1D1D1); 
+    if (_isDisabled && !widget.isLoading) return const Color(0xFFD1D1D1);
     if (widget.backgroundColor != null) return widget.backgroundColor!;
     return widget.isPrimary ? const Color(0xFFFFD700) : Colors.white;
   }
@@ -86,7 +86,9 @@ class _PixelButtonState extends State<PixelButton> {
   @override
   Widget build(BuildContext context) {
     // The "push down" offset when pressed (disabled during loading or if onPressed is null)
-    final double pushOffset = (_isPressed && !_isDisabled) ? widget.pixelSize : 0.0;
+    final double pushOffset = (_isPressed && !_isDisabled)
+        ? widget.pixelSize
+        : 0.0;
 
     Widget buttonContent = Row(
       mainAxisSize: MainAxisSize.min,
@@ -140,10 +142,22 @@ class _PixelButtonState extends State<PixelButton> {
             decoration: BoxDecoration(
               color: _effectiveBackgroundColor,
               boxShadow: [
-                BoxShadow(color: widget.borderColor, offset: Offset(-widget.pixelSize, 0)),
-                BoxShadow(color: widget.borderColor, offset: Offset(widget.pixelSize, 0)),
-                BoxShadow(color: widget.borderColor, offset: Offset(0, -widget.pixelSize)),
-                BoxShadow(color: widget.borderColor, offset: Offset(0, widget.pixelSize)),
+                BoxShadow(
+                  color: widget.borderColor,
+                  offset: Offset(-widget.pixelSize, 0),
+                ),
+                BoxShadow(
+                  color: widget.borderColor,
+                  offset: Offset(widget.pixelSize, 0),
+                ),
+                BoxShadow(
+                  color: widget.borderColor,
+                  offset: Offset(0, -widget.pixelSize),
+                ),
+                BoxShadow(
+                  color: widget.borderColor,
+                  offset: Offset(0, widget.pixelSize),
+                ),
                 // Hide 3D shadow if pressed or disabled
                 if (!_isPressed && !_isDisabled)
                   BoxShadow(

@@ -25,23 +25,26 @@ class HpBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (Color startColor, Color endColor, Color valueColor) =
-        switch (variant) {
+    final (
+      Color startColor,
+      Color endColor,
+      Color valueColor,
+    ) = switch (variant) {
       HpBarVariant.primary => (
-          AppColors.primary,
-          AppColors.primaryContainer,
-          AppColors.primary,
-        ),
+        AppColors.primary,
+        AppColors.primaryContainer,
+        AppColors.primary,
+      ),
       HpBarVariant.secondary => (
-          AppColors.secondary,
-          AppColors.secondaryFixed,
-          AppColors.secondary,
-        ),
+        AppColors.secondary,
+        AppColors.secondaryFixed,
+        AppColors.secondary,
+      ),
       HpBarVariant.tertiary => (
-          AppColors.tertiary,
-          AppColors.onTertiaryContainer,
-          AppColors.tertiary,
-        ),
+        AppColors.tertiary,
+        AppColors.onTertiaryContainer,
+        AppColors.tertiary,
+      ),
     };
 
     final double clampedProgress = progress.clamp(0.0, 1.0);
@@ -74,9 +77,7 @@ class HpBar extends StatelessWidget {
               ),
               Text(
                 value,
-                style: AppTypography.headlineXs.copyWith(
-                  color: valueColor,
-                ),
+                style: AppTypography.headlineXs.copyWith(color: valueColor),
               ),
             ],
           ),
@@ -88,10 +89,7 @@ class HpBar extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color: AppColors.surfaceContainerHighest,
-              border: Border.all(
-                color: AppColors.primary,
-                width: 2,
-              ),
+              border: Border.all(color: AppColors.primary, width: 2),
             ),
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
@@ -100,7 +98,8 @@ class HpBar extends StatelessWidget {
                   duration: const Duration(milliseconds: 1000),
                   curve: Curves.easeOutCubic,
                   builder: (context, animatedProgress, child) {
-                    final double fillWidth = constraints.maxWidth * animatedProgress;
+                    final double fillWidth =
+                        constraints.maxWidth * animatedProgress;
                     return Stack(
                       children: [
                         // Gradient fill
@@ -146,8 +145,4 @@ class HpBar extends StatelessWidget {
 }
 
 /// Color variant for the HP bar.
-enum HpBarVariant {
-  primary,
-  secondary,
-  tertiary,
-}
+enum HpBarVariant { primary, secondary, tertiary }

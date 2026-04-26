@@ -32,18 +32,12 @@ final GetIt getIt = GetIt.instance;
 /// 4. BLoCs / Cubits
 Future<void> configureDependencies() async {
   // ── 1. External Services ──
-  getIt.registerLazySingleton<FirebaseAuth>(
-    () => FirebaseAuth.instance,
-  );
+  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
-  getIt.registerLazySingleton<FirebaseStorage>(
-    () => FirebaseStorage.instance,
-  );
-  getIt.registerLazySingleton<GoogleSignIn>(
-    () => GoogleSignIn(),
-  );
+  getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
+  getIt.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn());
 
   // ── 2. Data Sources ──
   getIt.registerLazySingleton<AuthRemoteDataSource>(
@@ -67,19 +61,13 @@ Future<void> configureDependencies() async {
     ),
   );
   getIt.registerLazySingleton<AttemptRepository>(
-    () => AttemptRepository(
-      firestore: getIt<FirebaseFirestore>(),
-    ),
+    () => AttemptRepository(firestore: getIt<FirebaseFirestore>()),
   );
   getIt.registerLazySingleton<QuestRepository>(
-    () => QuestRepository(
-      firestore: getIt<FirebaseFirestore>(),
-    ),
+    () => QuestRepository(firestore: getIt<FirebaseFirestore>()),
   );
   getIt.registerLazySingleton<UserRepository>(
-    () => UserRepository(
-      firestore: getIt<FirebaseFirestore>(),
-    ),
+    () => UserRepository(firestore: getIt<FirebaseFirestore>()),
   );
   getIt.registerLazySingleton<StoreRepository>(
     () => StoreRepository(
@@ -90,14 +78,10 @@ Future<void> configureDependencies() async {
 
   // ── 4. BLoCs / Cubits ──
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(
-      authRepository: getIt<AuthRepository>(),
-    ),
+    () => AuthBloc(authRepository: getIt<AuthRepository>()),
   );
   getIt.registerFactory<ExamBloc>(
-    () => ExamBloc(
-      examRepository: getIt<ExamRepository>(),
-    ),
+    () => ExamBloc(examRepository: getIt<ExamRepository>()),
   );
   getIt.registerFactory<AttemptBloc>(
     () => AttemptBloc(

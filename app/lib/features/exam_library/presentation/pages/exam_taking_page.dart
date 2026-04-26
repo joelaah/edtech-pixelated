@@ -24,7 +24,8 @@ class ExamTakingPage extends StatefulWidget {
   State<ExamTakingPage> createState() => _ExamTakingPageState();
 }
 
-class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStateMixin {
+class _ExamTakingPageState extends State<ExamTakingPage>
+    with TickerProviderStateMixin {
   int _currentQuestionIndex = 0;
   late int _timeLeftSeconds;
   Timer? _timer;
@@ -75,225 +76,240 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AttemptBloc, AttemptState>(
-        listener: (context, state) {
-          if (state is AttemptInProgress && _timer == null) {
-            _startTimer(state.exam.durationMinutes);
-          }
-          if (state is AttemptCompleted) {
-            context.go('/exams/${widget.examId}/results');
-          }
-        },
-        builder: (context, state) {
-          if (state is AttemptLoadInProgress) {
-            return Scaffold(
-              backgroundColor: AppColors.surface,
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(color: AppColors.primary),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'LOADING MISSION...',
-                      style: AppTypography.headlineXs.copyWith(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          if (state is AttemptFailure) {
-            return Scaffold(
-              backgroundColor: AppColors.surface,
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, color: AppColors.error, size: 64),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        state.message,
-                        textAlign: TextAlign.center,
-                        style: AppTypography.bodyLg.copyWith(color: AppColors.error),
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      PixelButton(
-                        label: 'GO BACK',
-                        onPressed: () => context.go('/exams'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
-
-          if (state is! AttemptInProgress) {
-            return const Scaffold(
-              backgroundColor: AppColors.surface,
-              body: SizedBox.shrink(),
-            );
-          }
-
-          // ── Active exam UI ──
-          final questions = state.questions;
-          final totalQuestions = questions.length;
-          final currentQuestion = questions[_currentQuestionIndex];
-          final progress = (_currentQuestionIndex + 1) / totalQuestions;
-          final selectedAnswer = state.selectedAnswers[_currentQuestionIndex];
-
+      listener: (context, state) {
+        if (state is AttemptInProgress && _timer == null) {
+          _startTimer(state.exam.durationMinutes);
+        }
+        if (state is AttemptCompleted) {
+          context.go('/exams/${widget.examId}/results');
+        }
+      },
+      builder: (context, state) {
+        if (state is AttemptLoadInProgress) {
           return Scaffold(
             backgroundColor: AppColors.surface,
-            appBar: _buildAppBar(),
-            body: SafeArea(
+            body: Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Progress Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    child: HpBar(
-                      label: 'PROGRESS',
-                      value: '${_currentQuestionIndex + 1}/$totalQuestions',
-                      progress: progress,
-                    ),
-                  ),
-
-                  // Question Content
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: SingleChildScrollView(
-                        key: ValueKey<int>(_currentQuestionIndex),
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: BoxDecoration(
-                                color: AppColors.surfaceContainerLow,
-                                border: Border.all(
-                                  color: AppColors.primary,
-                                  width: 4,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Marks badge
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: AppSpacing.sm,
-                                        vertical: 2,
-                                      ),
-                                      color: AppColors.tertiary.withValues(alpha: 0.15),
-                                      child: Text(
-                                        '${currentQuestion.points} ${currentQuestion.points == 1 ? 'mark' : 'marks'}',
-                                        style: AppTypography.labelSm.copyWith(
-                                          color: AppColors.tertiary,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  LatexText(
-                                    currentQuestion.questionText,
-                                    style: AppTypography.bodyXl.copyWith(
-                                      color: AppColors.onSurface,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-
-                            Text(
-                              'SELECT ANSWER:',
-                              style: AppTypography.headlineXs.copyWith(
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-
-                            // Build option buttons from live data
-                            for (int i = 0; i < currentQuestion.options.length; i++) ...[
-                              _buildOption(
-                                context,
-                                index: i,
-                                text: currentQuestion.options[i],
-                                isSelected: selectedAnswer == currentQuestion.options[i],
-                                onTap: () {
-                                  context.read<AttemptBloc>().add(AnswerSelected(
-                                    questionIndex: _currentQuestionIndex,
-                                    selectedOption: currentQuestion.options[i],
-                                  ));
-                                },
-                              ),
-                              if (i < currentQuestion.options.length - 1)
-                                const SizedBox(height: AppSpacing.sm),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Navigation Footer
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: const BoxDecoration(
-                      color: AppColors.surfaceContainerLowest,
-                      border: Border(
-                        top: BorderSide(color: AppColors.surfaceDim, width: 4),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: PixelButton(
-                            label: 'PREV',
-                            isPrimary: false,
-                            onPressed: _currentQuestionIndex > 0
-                                ? () => setState(() => _currentQuestionIndex--)
-                                : null,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _currentQuestionIndex == totalQuestions - 1
-                              ? PixelButton(
-                                  label: 'FINISH',
-                                  icon: Icons.flag,
-                                  onPressed: _submitExam,
-                                )
-                              : PixelButton(
-                                  label: 'NEXT',
-                                  onPressed: () {
-                                    setState(() => _currentQuestionIndex++);
-                                  },
-                                ),
-                        ),
-                      ],
+                  const CircularProgressIndicator(color: AppColors.primary),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'LOADING MISSION...',
+                    style: AppTypography.headlineXs.copyWith(
+                      color: AppColors.primary,
                     ),
                   ),
                 ],
               ),
             ),
           );
-        },
-      );
+        }
+
+        if (state is AttemptFailure) {
+          return Scaffold(
+            backgroundColor: AppColors.surface,
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                      size: 64,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyLg.copyWith(
+                        color: AppColors.error,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    PixelButton(
+                      label: 'GO BACK',
+                      onPressed: () => context.go('/exams'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (state is! AttemptInProgress) {
+          return const Scaffold(
+            backgroundColor: AppColors.surface,
+            body: SizedBox.shrink(),
+          );
+        }
+
+        // ── Active exam UI ──
+        final questions = state.questions;
+        final totalQuestions = questions.length;
+        final currentQuestion = questions[_currentQuestionIndex];
+        final progress = (_currentQuestionIndex + 1) / totalQuestions;
+        final selectedAnswer = state.selectedAnswers[_currentQuestionIndex];
+
+        return Scaffold(
+          backgroundColor: AppColors.surface,
+          appBar: _buildAppBar(),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Progress Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  child: HpBar(
+                    label: 'PROGRESS',
+                    value: '${_currentQuestionIndex + 1}/$totalQuestions',
+                    progress: progress,
+                  ),
+                ),
+
+                // Question Content
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: SingleChildScrollView(
+                      key: ValueKey<int>(_currentQuestionIndex),
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceContainerLow,
+                              border: Border.all(
+                                color: AppColors.primary,
+                                width: 4,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Marks badge
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: 2,
+                                    ),
+                                    color: AppColors.tertiary.withValues(
+                                      alpha: 0.15,
+                                    ),
+                                    child: Text(
+                                      '${currentQuestion.points} ${currentQuestion.points == 1 ? 'mark' : 'marks'}',
+                                      style: AppTypography.labelSm.copyWith(
+                                        color: AppColors.tertiary,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                LatexText(
+                                  currentQuestion.questionText,
+                                  style: AppTypography.bodyXl.copyWith(
+                                    color: AppColors.onSurface,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+
+                          Text(
+                            'SELECT ANSWER:',
+                            style: AppTypography.headlineXs.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+
+                          // Build option buttons from live data
+                          for (
+                            int i = 0;
+                            i < currentQuestion.options.length;
+                            i++
+                          ) ...[
+                            _buildOption(
+                              context,
+                              index: i,
+                              text: currentQuestion.options[i],
+                              isSelected:
+                                  selectedAnswer == currentQuestion.options[i],
+                              onTap: () {
+                                context.read<AttemptBloc>().add(
+                                  AnswerSelected(
+                                    questionIndex: _currentQuestionIndex,
+                                    selectedOption: currentQuestion.options[i],
+                                  ),
+                                );
+                              },
+                            ),
+                            if (i < currentQuestion.options.length - 1)
+                              const SizedBox(height: AppSpacing.sm),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Navigation Footer
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: const BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    border: Border(
+                      top: BorderSide(color: AppColors.surfaceDim, width: 4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: PixelButton(
+                          label: 'PREV',
+                          isPrimary: false,
+                          onPressed: _currentQuestionIndex > 0
+                              ? () => setState(() => _currentQuestionIndex--)
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _currentQuestionIndex == totalQuestions - 1
+                            ? PixelButton(
+                                label: 'FINISH',
+                                icon: Icons.flag,
+                                onPressed: _submitExam,
+                              )
+                            : PixelButton(
+                                label: 'NEXT',
+                                onPressed: () {
+                                  setState(() => _currentQuestionIndex++);
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   PreferredSizeWidget _buildAppBar() {
@@ -321,8 +337,8 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
               animation: _pulseController,
               builder: (context, child) {
                 return Opacity(
-                  opacity: _pulseController.isAnimating 
-                      ? 1.0 - (_pulseController.value * 0.5) 
+                  opacity: _pulseController.isAnimating
+                      ? 1.0 - (_pulseController.value * 0.5)
                       : 1.0,
                   child: child,
                 );
@@ -338,7 +354,9 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
                   Text(
                     _timer != null ? _formattedTime : '--:--',
                     style: AppTypography.headlineSm.copyWith(
-                      color: isLowTime ? AppColors.onError : AppColors.onPrimary,
+                      color: isLowTime
+                          ? AppColors.onError
+                          : AppColors.onPrimary,
                     ),
                   ),
                 ],
@@ -364,7 +382,9 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondary.withValues(alpha: 0.1) : AppColors.surface,
+          color: isSelected
+              ? AppColors.secondary.withValues(alpha: 0.1)
+              : AppColors.surface,
           border: Border.all(
             color: isSelected ? AppColors.secondary : AppColors.outlineVariant,
             width: isSelected ? 4 : 2,
@@ -378,9 +398,13 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.secondary : AppColors.surfaceContainerHigh,
+                color: isSelected
+                    ? AppColors.secondary
+                    : AppColors.surfaceContainerHigh,
                 border: Border.all(
-                  color: isSelected ? AppColors.secondary : AppColors.outlineVariant,
+                  color: isSelected
+                      ? AppColors.secondary
+                      : AppColors.outlineVariant,
                   width: 2,
                 ),
               ),
@@ -388,7 +412,9 @@ class _ExamTakingPageState extends State<ExamTakingPage> with TickerProviderStat
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: AppTypography.headlineXs.copyWith(
-                    color: isSelected ? AppColors.onSecondary : AppColors.onSurfaceVariant,
+                    color: isSelected
+                        ? AppColors.onSecondary
+                        : AppColors.onSurfaceVariant,
                   ),
                   child: Text(
                     String.fromCharCode(65 + index), // A, B, C, D

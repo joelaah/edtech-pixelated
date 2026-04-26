@@ -30,17 +30,12 @@ class QuestRepository with FirebaseGuardedExecution {
 
   /// Fetch all quests (admin).
   Future<Result<List<QuestModel>>> fetchAllQuests() async {
-    return guardedTask(
-      () async {
-        final QuerySnapshot<Map<String, dynamic>> snapshot =
-            await _questsCollection.get();
+    return guardedTask(() async {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _questsCollection.get();
 
-        return snapshot.docs
-            .map(_mapDocToQuest)
-            .toList();
-      },
-      taskName: 'fetchAllQuests',
-    );
+      return snapshot.docs.map(_mapDocToQuest).toList();
+    }, taskName: 'fetchAllQuests');
   }
 
   /// Create a new quest (admin only).
@@ -52,27 +47,24 @@ class QuestRepository with FirebaseGuardedExecution {
     required int xpReward,
     required String iconName,
   }) async {
-    return guardedTask(
-      () async {
-        final Map<String, dynamic> data = {
-          'title': title,
-          'description': description,
-          'type': type.name,
-          'targetValue': targetValue,
-          'xpReward': xpReward,
-          'iconName': iconName,
-          'isActive': true,
-        };
+    return guardedTask(() async {
+      final Map<String, dynamic> data = {
+        'title': title,
+        'description': description,
+        'type': type.name,
+        'targetValue': targetValue,
+        'xpReward': xpReward,
+        'iconName': iconName,
+        'isActive': true,
+      };
 
-        final DocumentReference<Map<String, dynamic>> docRef =
-            await _questsCollection.add(data);
-        AppLogger.instance.i('Quest created: ${docRef.id}');
+      final DocumentReference<Map<String, dynamic>> docRef =
+          await _questsCollection.add(data);
+      AppLogger.instance.i('Quest created: ${docRef.id}');
 
-        final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
-        return _mapDocToQuest(doc);
-      },
-      taskName: 'createQuest',
-    );
+      final DocumentSnapshot<Map<String, dynamic>> doc = await docRef.get();
+      return _mapDocToQuest(doc);
+    }, taskName: 'createQuest');
   }
 
   /// Update a quest (admin only).
@@ -80,24 +72,18 @@ class QuestRepository with FirebaseGuardedExecution {
     required String questId,
     required Map<String, dynamic> updates,
   }) async {
-    return guardedTask(
-      () async {
-        await _questsCollection.doc(questId).update(updates);
-        AppLogger.instance.i('Quest updated: $questId');
-      },
-      taskName: 'updateQuest',
-    );
+    return guardedTask(() async {
+      await _questsCollection.doc(questId).update(updates);
+      AppLogger.instance.i('Quest updated: $questId');
+    }, taskName: 'updateQuest');
   }
 
   /// Delete a quest (admin only).
   Future<Result<void>> deleteQuest(String questId) async {
-    return guardedTask(
-      () async {
-        await _questsCollection.doc(questId).delete();
-        AppLogger.instance.i('Quest deleted: $questId');
-      },
-      taskName: 'deleteQuest',
-    );
+    return guardedTask(() async {
+      await _questsCollection.doc(questId).delete();
+      AppLogger.instance.i('Quest deleted: $questId');
+    }, taskName: 'deleteQuest');
   }
 
   QuestModel _mapDocToQuest(DocumentSnapshot<Map<String, dynamic>> doc) {

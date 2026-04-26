@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 
 /// Pre-defined typographic variants specifically tuned for pixel fonts.
-enum PixelTextVariant {
-  heading1,
-  heading2,
-  body,
-  caption,
-}
+enum PixelTextVariant { heading1, heading2, body, caption }
 
 /// A centralized typography widget for pixel-art fonts.
-/// 
-/// 8-bit fonts require specific sizing, letter-spacing, and line-heights 
+///
+/// 8-bit fonts require specific sizing, letter-spacing, and line-heights
 /// to remain legible. This widget enforces those rules across the app.
 class PixelTypography extends StatelessWidget {
   final String text;
@@ -36,7 +31,8 @@ class PixelTypography extends StatelessWidget {
     final baseStyle = TextStyle(
       fontFamily: 'PressStart2P',
       color: color ?? Colors.black,
-      height: 1.5, // Increased line height to prevent blocky characters from bleeding into each other
+      height:
+          1.5, // Increased line height to prevent blocky characters from bleeding into each other
     );
 
     switch (variant) {
@@ -54,14 +50,12 @@ class PixelTypography extends StatelessWidget {
         );
       case PixelTextVariant.body:
         return baseStyle.copyWith(
-          fontSize: 12, // Pixel fonts generally appear much larger than standard fonts
+          fontSize:
+              12, // Pixel fonts generally appear much larger than standard fonts
           letterSpacing: 1.0,
         );
       case PixelTextVariant.caption:
-        return baseStyle.copyWith(
-          fontSize: 8,
-          letterSpacing: 0.5,
-        );
+        return baseStyle.copyWith(fontSize: 8, letterSpacing: 0.5);
     }
   }
 

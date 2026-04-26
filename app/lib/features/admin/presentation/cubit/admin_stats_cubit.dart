@@ -49,9 +49,9 @@ class AdminStatsCubit extends Cubit<AdminStatsState> {
   AdminStatsCubit({
     required ExamRepository examRepository,
     required UserRepository userRepository,
-  })  : _examRepository = examRepository,
-        _userRepository = userRepository,
-        super(const AdminStatsState());
+  }) : _examRepository = examRepository,
+       _userRepository = userRepository,
+       super(const AdminStatsState());
 
   /// Loads all admin stats in parallel.
   Future<void> loadStats() async {
@@ -79,10 +79,12 @@ class AdminStatsCubit extends Cubit<AdminStatsState> {
       totalUsers = userCountResult.data;
     }
 
-    emit(AdminStatsState(
-      isLoading: false,
-      totalUsers: totalUsers,
-      activeExams: activeExams,
-    ));
+    emit(
+      AdminStatsState(
+        isLoading: false,
+        totalUsers: totalUsers,
+        activeExams: activeExams,
+      ),
+    );
   }
 }
