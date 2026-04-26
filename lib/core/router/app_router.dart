@@ -19,6 +19,7 @@ import 'package:bitwise_academy/features/admin/presentation/pages/create_questio
 import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_taking_page.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_results_page.dart';
 import 'package:bitwise_academy/core/widgets/shell_scaffold.dart';
+import 'package:bitwise_academy/core/widgets/feature_toggle.dart';
 
 import 'package:bitwise_academy/features/admin/presentation/pages/admin_upload_skin_page.dart';
 import 'package:bitwise_academy/features/store/presentation/pages/avatar_store_page.dart';
@@ -180,9 +181,20 @@ GoRouter buildRouter(AuthBloc authBloc) {
             path: RoutePaths.store,
             name: 'store',
             builder: (BuildContext context, GoRouterState state) =>
-                BlocProvider(
-              create: (_) => getIt<StoreCubit>()..loadSkins(),
-              child: const AvatarStorePage(),
+                FeatureToggle(
+              flagName: 'show_pixel_storefront',
+              onEnabled: const Scaffold(
+                body: Center(
+                  child: Text(
+                    'New Pixel UI Coming Soon',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              onDisabled: BlocProvider(
+                create: (_) => getIt<StoreCubit>()..loadSkins(),
+                child: const AvatarStorePage(),
+              ),
             ),
           ),
 
