@@ -259,9 +259,12 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
         children: [
           Icon(icon, size: 24, color: AppColors.primary),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            value,
-            style: AppTypography.headlineSm.copyWith(color: AppColors.primary),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: AppTypography.headlineSm.copyWith(color: AppColors.primary),
+            ),
           ),
           const SizedBox(height: 2),
           Text(
