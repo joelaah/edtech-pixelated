@@ -16,6 +16,9 @@ void main() {
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
+    // Stub authStateChanges before initializing AuthBloc
+    when(() => mockAuthRepository.authStateChanges)
+        .thenAnswer((_) => const Stream.empty());
     authBloc = AuthBloc(authRepository: mockAuthRepository);
   });
 
