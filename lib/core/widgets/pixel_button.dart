@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:bitwise_academy/core/constants/app_typography.dart';
 
 /// Defines the visual style of the [PixelButton].
 enum PixelButtonType { primary, secondary }
@@ -112,9 +112,8 @@ class _PixelButtonState extends State<PixelButton> {
         Text(
           widget.isLoading ? 'LOADING...' : widget.label.toUpperCase(),
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: AppTypography.labelLg.copyWith(
             color: _effectiveTextColor,
-            fontFamily: GoogleFonts.pressStart2p().fontFamily,
             fontSize: 12,
             letterSpacing: 1.0,
           ),
