@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:bitwise_academy/core/constants/app_colors.dart';
 import 'package:bitwise_academy/core/constants/app_spacing.dart';
 import 'package:bitwise_academy/core/constants/app_typography.dart';
@@ -85,7 +86,7 @@ class _PixelCardState extends State<PixelCard> {
                       style: AppTypography.labelSm.copyWith(
                         color: AppColors.onTertiary,
                         fontSize: 8,
-                        fontFamily: 'PressStart2P',
+                        fontFamily: GoogleFonts.pressStart2p().fontFamily,
                       ),
                     ),
                   ),

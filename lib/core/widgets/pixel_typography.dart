@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Pre-defined typographic variants specifically tuned for pixel fonts.
 enum PixelTextVariant { heading1, heading2, body, caption }
@@ -27,9 +28,9 @@ class PixelTypography extends StatelessWidget {
 
   /// Retrieves the meticulously tuned text style for the variant.
   TextStyle _getStyle(BuildContext context) {
-    // We assume 'PressStart2P' or a similar font will be declared in pubspec.yaml
+    // We use GoogleFonts.pressStart2p() to ensure the font is correctly loaded
     final baseStyle = TextStyle(
-      fontFamily: 'PressStart2P',
+      fontFamily: GoogleFonts.pressStart2p().fontFamily,
       color: color ?? Colors.black,
       height:
           1.5, // Increased line height to prevent blocky characters from bleeding into each other

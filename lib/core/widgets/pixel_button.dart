@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Defines the visual style of the [PixelButton].
 enum PixelButtonType { primary, secondary }
@@ -113,7 +114,7 @@ class _PixelButtonState extends State<PixelButton> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _effectiveTextColor,
-            fontFamily: 'PressStart2P',
+            fontFamily: GoogleFonts.pressStart2p().fontFamily,
             fontSize: 12,
             letterSpacing: 1.0,
           ),
