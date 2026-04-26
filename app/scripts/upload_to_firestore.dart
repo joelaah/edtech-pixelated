@@ -110,7 +110,9 @@ void main() async {
       // Update unique lists
       uniqueSubjects.add((examDoc['subject'] as String?) ?? 'General');
       uniqueGroups.add((examDoc['group'] as String?) ?? '');
-      uniqueDifficulties.add((examDoc['difficultyTier'] as String?) ?? 'medium');
+      uniqueDifficulties.add(
+        (examDoc['difficultyTier'] as String?) ?? 'medium',
+      );
 
       // Add questions to batch
       for (final dynamic q in questions) {
@@ -145,9 +147,17 @@ void main() async {
       final configSnapshot = await configRef.get();
       final existingData = configSnapshot.data();
       if (existingData != null) {
-        uniqueSubjects.addAll(List<String>.from((existingData['subjects'] as List<dynamic>?) ?? []));
-        uniqueGroups.addAll(List<String>.from((existingData['groups'] as List<dynamic>?) ?? []));
-        uniqueDifficulties.addAll(List<String>.from((existingData['difficulties'] as List<dynamic>?) ?? []));
+        uniqueSubjects.addAll(
+          List<String>.from((existingData['subjects'] as List<dynamic>?) ?? []),
+        );
+        uniqueGroups.addAll(
+          List<String>.from((existingData['groups'] as List<dynamic>?) ?? []),
+        );
+        uniqueDifficulties.addAll(
+          List<String>.from(
+            (existingData['difficulties'] as List<dynamic>?) ?? [],
+          ),
+        );
       }
     } catch (e) {
       print('   ℹ️ Creating new mock_test_metadata document.');
