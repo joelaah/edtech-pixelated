@@ -28,8 +28,26 @@ class _QuestPageState extends State<QuestPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<QuestBloc>(
-      create: (_) => getIt<QuestBloc>()..add(const LoadActiveQuestsRequested()),
+    return BlocListener<QuestBloc, QuestState>(
+      listener: (context, state) {
+        // Handle quest XP awarding states
+        if (state is QuestXpAwardSuccess) {
+          // Sync auth state with the real updated UserEntity from awardXp.
+          context.read<AuthBloc>().add(
+            AuthUserUpdated(user: state.updatedUser),
+          );
+        }
+
+        if (state is QuestXpAwardFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to award XP: ${state.error}'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
       child: BlocBuilder<QuestBloc, QuestState>(
         builder: (context, questState) {
           if (questState is QuestLoadInProgress) {
@@ -91,35 +109,6 @@ class _QuestPageState extends State<QuestPage> {
             weeklyQuests = questState.weeklyQuests;
           }
 
-          // Handle quest XP awarding states
-          if (questState is QuestXpAwardSuccess) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('+${questState.xpAwarded} XP earned!'),
-                  backgroundColor: AppColors.secondary,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-              // Sync auth state with the real updated UserEntity from awardXp.
-              context.read<AuthBloc>().add(
-                AuthUserUpdated(user: questState.updatedUser),
-              );
-            });
-          }
-
-          if (questState is QuestXpAwardFailure) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Failed to award XP: ${questState.error}'),
-                  backgroundColor: AppColors.error,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            });
-          }
-
           // Wrap with AttemptBloc builder to get test completion count.
           return BlocBuilder<AttemptBloc, AttemptState>(
             builder: (context, attemptState) {
@@ -172,6 +161,8 @@ class _QuestPageState extends State<QuestPage> {
                   }
                 }
                 if (quest != null && authState is AuthAuthenticated) {
+                  // Light impact for the moment of completion discovery
+                  HapticFeedback.lightImpact();
                   context.read<QuestBloc>().add(
                     AwardQuestXp(
                       uid: authState.user.uid,
@@ -398,39 +389,19 @@ class _QuestPageState extends State<QuestPage> {
 
     // Map icon string to actual IconData
     IconData iconData = Icons.star;
-    if (quest.iconName == 'bolt') {
-      iconData = Icons.bolt;
-    }
-    if (quest.iconName == 'check_circle') {
-      iconData = Icons.check_circle;
-    }
-    if (quest.iconName == 'quiz') {
-      iconData = Icons.quiz;
-    }
-    if (quest.iconName == 'local_fire_department') {
-      iconData = Icons.local_fire_department;
-    }
-    if (quest.iconName == 'school') {
-      iconData = Icons.school;
-    }
+    if (quest.iconName == 'bolt') iconData = Icons.bolt;
+    if (quest.iconName == 'check_circle') iconData = Icons.check_circle;
+    if (quest.iconName == 'quiz') iconData = Icons.quiz;
+    if (quest.iconName == 'local_fire_department') iconData = Icons.local_fire_department;
+    if (quest.iconName == 'school') iconData = Icons.school;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: isCompleted
-            ? color.withValues(alpha: 0.08)
-            : AppColors.surfaceContainerLowest,
-        border: Border(
-          left: BorderSide(
-            color: isCompleted ? color : AppColors.outlineVariant,
-            width: 6,
-          ),
-          bottom: BorderSide(
-            color: isCompleted ? color : AppColors.primary,
-            width: isCompleted ? 2 : 4,
-          ),
-        ),
-      ),
+    return PixelCard(
+      borderColor: isCompleted ? color : AppColors.primary,
+      backgroundColor: isCompleted
+          ? color.withValues(alpha: 0.1)
+          : AppColors.surfaceContainerLowest,
+      badge: isCompleted ? 'DONE' : null,
+      badgeColor: color,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -490,17 +461,34 @@ class _QuestPageState extends State<QuestPage> {
           ),
 
           // Progress bar
-          if (!isCompleted && progress > 0) ...[
+          if (!isCompleted) ...[
             const SizedBox(height: AppSpacing.md),
-            Container(
-              height: 8,
-              width: double.infinity,
-              color: AppColors.surfaceContainerHighest,
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: progress,
-                child: Container(color: color),
-              ),
+            Stack(
+              children: [
+                Container(
+                  height: 12,
+                  width: double.infinity,
+                  color: AppColors.surfaceContainerHighest,
+                ),
+                // Animated Progress Bar
+                Container(
+                  height: 12,
+                  width: double.infinity,
+                  color: Colors.transparent,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: progress,
+                    child: Container(color: color),
+                  ),
+                )
+                    .animate()
+                    .scaleX(
+                      duration: 800.ms,
+                      curve: Curves.easeOutBack,
+                      alignment: Alignment.centerLeft,
+                      begin: 0,
+                    ),
+              ],
             ),
             const SizedBox(height: 4),
             Align(
@@ -515,6 +503,9 @@ class _QuestPageState extends State<QuestPage> {
           ],
         ],
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }

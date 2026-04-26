@@ -8,12 +8,10 @@ import 'package:bitwise_academy/core/theme/app_theme.dart';
 import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/exam_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
+import 'package:bitwise_academy/features/quest/presentation/bloc/quest_bloc.dart';
+import 'package:bitwise_academy/core/widgets/quest_celebration_overlay.dart';
 
 /// Root application widget.
-///
-/// Provides the [AuthBloc] at the top of the widget tree so that
-/// the router redirect can read auth state, and all child pages
-/// can access it.
 class RimsApp extends StatefulWidget {
   const RimsApp({super.key});
 
@@ -47,13 +45,43 @@ class _RimsAppState extends State<RimsApp> {
           create: (_) => getIt<ExamBloc>()..add(const LoadExamsRequested()),
         ),
         BlocProvider<AttemptBloc>(create: (_) => getIt<AttemptBloc>()),
+        BlocProvider<QuestBloc>(
+          create: (_) => getIt<QuestBloc>()..add(const LoadActiveQuestsRequested()),
+        ),
       ],
-      child: MaterialApp.router(
-        title: 'RIMS',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        routerConfig: _router,
+      child: BlocListener<QuestBloc, QuestState>(
+        listenWhen: (previous, current) => current is QuestXpAwardSuccess,
+        listener: (context, state) {
+          if (state is QuestXpAwardSuccess) {
+            _showCelebration(context, state);
+            context.read<QuestBloc>().add(const AcknowledgeQuestXpAward());
+          }
+        },
+        child: MaterialApp.router(
+          title: 'RIMS',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          routerConfig: _router,
+        ),
       ),
+    );
+  }
+
+  void _showCelebration(BuildContext context, QuestXpAwardSuccess state) {
+    // We use showGeneralDialog to have full control over the overlay
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Quest Celebration',
+      barrierColor: Colors.transparent, // Handled by overlay itself
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return QuestCelebrationOverlay(
+          questTitle: state.quest.title,
+          xpAwarded: state.xpAwarded,
+          onDismiss: () => Navigator.of(context).pop(),
+        );
+      },
     );
   }
 }
