@@ -56,6 +56,10 @@ final class AwardQuestXp extends QuestEvent {
   List<Object?> get props => [uid, questId, xpAmount];
 }
 
+final class AcknowledgeQuestXpAward extends QuestEvent {
+  const AcknowledgeQuestXpAward();
+}
+
 // ── States ──
 
 sealed class QuestState extends Equatable {
@@ -176,6 +180,7 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
     on<_ActiveQuestsUpdated>(_onActiveQuestsUpdated);
     on<_ActiveQuestsError>(_onActiveQuestsError);
     on<AwardQuestXp>(_onAwardQuestXp);
+    on<AcknowledgeQuestXpAward>(_onAcknowledgeQuestXpAward);
   }
 
   void _onLoadActiveQuests(
@@ -289,6 +294,19 @@ class QuestBloc extends Bloc<QuestEvent, QuestState> {
           previousState: prevState,
         ),
       );
+    }
+  }
+
+  void _onAcknowledgeQuestXpAward(
+    AcknowledgeQuestXpAward event,
+    Emitter<QuestState> emit,
+  ) {
+    if (state is QuestXpAwardSuccess) {
+      final success = state as QuestXpAwardSuccess;
+      // Emit the previous state but with the new quest ID added to completed IDs if needed.
+      // Actually, QuestLoadSuccess in this Bloc currently has empty completedQuestIds because it's managed by the repository watch.
+      // But we can at least return to a non-success state to reset the listener.
+      emit(success.previousState);
     }
   }
 

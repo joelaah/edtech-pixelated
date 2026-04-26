@@ -110,6 +110,15 @@ void main() async {
         qData['points'] = (qData['points'] as num?)?.toInt() ?? 1;
         qData['order'] = (qData['order'] as num?)?.toInt() ?? 0;
 
+        // Inject parent metadata for global random queries
+        qData['subject'] = examDoc['subject'];
+        qData['difficulty'] = examDoc['difficultyTier'];
+        qData['group'] = examDoc['group'];
+
+        // Add random seed for selection
+        qData['random'] =
+            (DateTime.now().microsecondsSinceEpoch % 1000000) / 1000000.0;
+
         final qRef = examRef.collection('questions').doc();
         batch.set(qRef, qData);
       }

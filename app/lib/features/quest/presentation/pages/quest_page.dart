@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bitwise_academy/core/constants/app_colors.dart';
 import 'package:bitwise_academy/core/constants/app_spacing.dart';
 import 'package:bitwise_academy/core/constants/app_typography.dart';
-import 'package:bitwise_academy/core/di/injection.dart';
+import 'package:bitwise_academy/core/widgets/pixel_card.dart';
 import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
 import 'package:bitwise_academy/features/quest/presentation/bloc/quest_bloc.dart';
@@ -28,8 +30,26 @@ class _QuestPageState extends State<QuestPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<QuestBloc>(
-      create: (_) => getIt<QuestBloc>()..add(const LoadActiveQuestsRequested()),
+    return BlocListener<QuestBloc, QuestState>(
+      listener: (context, state) {
+        // Handle quest XP awarding states
+        if (state is QuestXpAwardSuccess) {
+          // Sync auth state with the real updated UserEntity from awardXp.
+          context.read<AuthBloc>().add(
+            AuthUserUpdated(user: state.updatedUser),
+          );
+        }
+
+        if (state is QuestXpAwardFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to award XP: ${state.error}'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
       child: BlocBuilder<QuestBloc, QuestState>(
         builder: (context, questState) {
           if (questState is QuestLoadInProgress) {
@@ -91,35 +111,6 @@ class _QuestPageState extends State<QuestPage> {
             weeklyQuests = questState.weeklyQuests;
           }
 
-          // Handle quest XP awarding states
-          if (questState is QuestXpAwardSuccess) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('+${questState.xpAwarded} XP earned!'),
-                  backgroundColor: AppColors.secondary,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-              // Sync auth state with the real updated UserEntity from awardXp.
-              context.read<AuthBloc>().add(
-                AuthUserUpdated(user: questState.updatedUser),
-              );
-            });
-          }
-
-          if (questState is QuestXpAwardFailure) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Failed to award XP: ${questState.error}'),
-                  backgroundColor: AppColors.error,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            });
-          }
-
           // Wrap with AttemptBloc builder to get test completion count.
           return BlocBuilder<AttemptBloc, AttemptState>(
             builder: (context, attemptState) {
@@ -172,6 +163,8 @@ class _QuestPageState extends State<QuestPage> {
                   }
                 }
                 if (quest != null && authState is AuthAuthenticated) {
+                  // Light impact for the moment of completion discovery
+                  HapticFeedback.lightImpact();
                   context.read<QuestBloc>().add(
                     AwardQuestXp(
                       uid: authState.user.uid,
@@ -401,111 +394,122 @@ class _QuestPageState extends State<QuestPage> {
     if (quest.iconName == 'bolt') iconData = Icons.bolt;
     if (quest.iconName == 'check_circle') iconData = Icons.check_circle;
     if (quest.iconName == 'quiz') iconData = Icons.quiz;
-    if (quest.iconName == 'local_fire_department')
+    if (quest.iconName == 'local_fire_department') {
       iconData = Icons.local_fire_department;
+    }
     if (quest.iconName == 'school') iconData = Icons.school;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: isCompleted
-            ? color.withValues(alpha: 0.08)
-            : AppColors.surfaceContainerLowest,
-        border: Border(
-          left: BorderSide(
-            color: isCompleted ? color : AppColors.outlineVariant,
-            width: 6,
-          ),
-          bottom: BorderSide(
-            color: isCompleted ? color : AppColors.primary,
-            width: isCompleted ? 2 : 4,
-          ),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return PixelCard(
+          borderColor: isCompleted ? color : AppColors.primary,
+          backgroundColor: isCompleted
+              ? color.withValues(alpha: 0.1)
+              : AppColors.surfaceContainerLowest,
+          badge: isCompleted ? 'DONE' : null,
+          badgeColor: color,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isCompleted ? color : AppColors.surfaceContainerHigh,
-                  border: Border.all(color: color, width: 2),
-                ),
-                child: Icon(
-                  isCompleted ? Icons.check : iconData,
-                  color: isCompleted ? Colors.white : color,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      quest.title,
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? color
+                          : AppColors.surfaceContainerHigh,
+                      border: Border.all(color: color, width: 2),
+                    ),
+                    child: Icon(
+                      isCompleted ? Icons.check : iconData,
+                      color: isCompleted ? Colors.white : color,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          quest.title,
+                          style: AppTypography.headlineXs.copyWith(
+                            color: isCompleted ? color : AppColors.onSurface,
+                            decoration: isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        Text(
+                          quest.description,
+                          style: AppTypography.bodyMd.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
+                    color: AppColors.secondaryContainer,
+                    child: Text(
+                      '+${quest.xpReward} XP',
                       style: AppTypography.headlineXs.copyWith(
-                        color: isCompleted ? color : AppColors.onSurface,
-                        decoration: isCompleted
-                            ? TextDecoration.lineThrough
-                            : null,
+                        color: AppColors.onSecondaryContainer,
+                        fontSize: 8,
                       ),
                     ),
-                    Text(
-                      quest.description,
-                      style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                  ),
+                ],
+              ),
+
+              // Progress bar
+              if (!isCompleted) ...[
+                const SizedBox(height: AppSpacing.md),
+                Stack(
+                  children: [
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      color: AppColors.surfaceContainerHighest,
+                    ),
+                    // Animated Progress Bar
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      color: Colors.transparent,
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: progress,
+                        child: Container(color: color),
                       ),
+                    ).animate().scaleX(
+                      duration: 800.ms,
+                      curve: Curves.easeOutBack,
+                      alignment: Alignment.centerLeft,
+                      begin: 0,
                     ),
                   ],
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 2,
-                ),
-                color: AppColors.secondaryContainer,
-                child: Text(
-                  '+${quest.xpReward} XP',
-                  style: AppTypography.headlineXs.copyWith(
-                    color: AppColors.onSecondaryContainer,
-                    fontSize: 8,
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${(progress * 100).toInt()}%',
+                    style: AppTypography.labelSm.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
-
-          // Progress bar
-          if (!isCompleted && progress > 0) ...[
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              height: 8,
-              width: double.infinity,
-              color: AppColors.surfaceContainerHighest,
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: progress,
-                child: Container(color: color),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '${(progress * 100).toInt()}%',
-                style: AppTypography.labelSm.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }

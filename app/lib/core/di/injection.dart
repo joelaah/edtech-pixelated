@@ -19,6 +19,7 @@ import 'package:bitwise_academy/shared/services/user_repository.dart';
 import 'package:bitwise_academy/features/store/data/repositories/store_repository.dart';
 import 'package:bitwise_academy/features/store/presentation/cubit/store_cubit.dart';
 import 'package:bitwise_academy/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:bitwise_academy/features/leaderboard/presentation/bloc/leaderboard_bloc.dart';
 
 /// Global [GetIt] service locator instance.
 final GetIt getIt = GetIt.instance;
@@ -112,5 +113,8 @@ Future<void> configureDependencies() async {
       userRepository: getIt<UserRepository>(),
       attemptRepository: getIt<AttemptRepository>(),
     ),
+  );
+  getIt.registerFactory<LeaderboardBloc>(
+    () => LeaderboardBloc(userRepository: getIt<UserRepository>()),
   );
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bitwise_academy/core/constants/app_typography.dart';
 import 'package:bitwise_academy/core/widgets/pixel_container.dart';
 
 /// A retro-style progress bar with a pixelated border.
@@ -41,20 +42,12 @@ class PixelProgressBar extends StatelessWidget {
                 if (label != null)
                   Text(
                     label!.toUpperCase(),
-                    style: const TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 10,
+                    style: AppTypography.headlineXs.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 if (valueText != null)
-                  Text(
-                    valueText!,
-                    style: const TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 10,
-                    ),
-                  ),
+                  Text(valueText!, style: AppTypography.headlineXs),
               ],
             ),
           ),

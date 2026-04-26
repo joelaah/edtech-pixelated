@@ -19,7 +19,8 @@ class ShellScaffold extends StatelessWidget {
     if (location == '/') return 0;
     if (location.startsWith('/exams')) return 1;
     if (location.startsWith('/quests')) return 2;
-    if (location.startsWith('/admin')) return 3;
+    if (location.startsWith('/leaderboard')) return 3;
+    if (location.startsWith('/admin')) return 4;
     return 0;
   }
 
@@ -32,6 +33,8 @@ class ShellScaffold extends StatelessWidget {
       case 2:
         context.go('/quests');
       case 3:
+        context.go('/leaderboard');
+      case 4:
         context.go('/admin');
     }
   }
@@ -54,13 +57,14 @@ class ShellScaffold extends StatelessWidget {
           ),
         ),
         child: Row(
-          children: List<Widget>.generate(4, (int index) {
+          children: List<Widget>.generate(5, (int index) {
             final bool isActive = currentIndex == index;
             const List<_NavItem> items = [
-              _NavItem(icon: Icons.home, label: 'HERO'),
-              _NavItem(icon: Icons.quiz, label: 'QUESTS'),
-              _NavItem(icon: Icons.shopping_bag, label: 'SHOP'),
-              _NavItem(icon: Icons.settings, label: 'CONFIG'),
+              _NavItem(icon: Icons.home_outlined, label: 'HERO'),
+              _NavItem(icon: Icons.auto_stories_outlined, label: 'EXAMS'),
+              _NavItem(icon: Icons.bolt_outlined, label: 'QUESTS'),
+              _NavItem(icon: Icons.emoji_events_outlined, label: 'RANKS'),
+              _NavItem(icon: Icons.settings_outlined, label: 'CONFIG'),
             ];
             final _NavItem item = items[index];
 

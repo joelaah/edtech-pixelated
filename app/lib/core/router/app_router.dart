@@ -15,6 +15,7 @@ import 'package:bitwise_academy/features/admin/presentation/pages/admin_dashboar
 import 'package:bitwise_academy/features/admin/presentation/pages/create_exam_page.dart';
 import 'package:bitwise_academy/features/admin/presentation/pages/exam_management_page.dart';
 import 'package:bitwise_academy/features/admin/presentation/pages/create_questions_page.dart';
+import 'package:bitwise_academy/features/leaderboard/presentation/pages/leaderboard_page.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_taking_page.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_results_page.dart';
 import 'package:bitwise_academy/core/widgets/shell_scaffold.dart';
@@ -37,6 +38,7 @@ abstract final class RoutePaths {
   static const String examResults = '/exams/:examId/results';
   static const String quests = '/quests';
   static const String store = '/store';
+  static const String leaderboard = '/leaderboard';
   static const String adminDashboard = '/admin';
   static const String adminCreateExam = '/admin/create-exam';
   static const String adminManageExams = '/admin/manage-exams';
@@ -188,6 +190,12 @@ GoRouter buildRouter(AuthBloc authBloc) {
                     child: const AvatarStorePage(),
                   ),
                 ),
+          ),
+          GoRoute(
+            path: RoutePaths.leaderboard,
+            name: 'leaderboard',
+            builder: (BuildContext context, GoRouterState state) =>
+                const LeaderboardPage(),
           ),
 
           // ── Admin routes (inside shell) ──

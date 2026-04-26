@@ -95,6 +95,109 @@ class ExamRepository with FirebaseGuardedExecution {
     }, taskName: 'fetchQuestions');
   }
 
+  /// Pull a random question matching criteria across all exams.
+  Future<Result<QuestionModel>> getRandomQuestion({
+    required String subject,
+    required String difficulty,
+    required String group,
+  }) async {
+    return guardedTask(() async {
+      final double seed =
+          (DateTime.now().microsecondsSinceEpoch % 1000000) / 1000000.0;
+
+      // 1. Try to find a document with random >= seed
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+          .collectionGroup('questions')
+          .where('subject', isEqualTo: subject)
+          .where('difficulty', isEqualTo: difficulty)
+          .where('group', isEqualTo: group)
+          .where('random', isGreaterThanOrEqualTo: seed)
+          .orderBy('random')
+          .limit(1)
+          .get();
+
+      // 2. Fallback if no document found in that range
+      if (snapshot.docs.isEmpty) {
+        snapshot = await _firestore
+            .collectionGroup('questions')
+            .where('subject', isEqualTo: subject)
+            .where('difficulty', isEqualTo: difficulty)
+            .where('group', isEqualTo: group)
+            .where('random', isLessThan: seed)
+            .orderBy('random', descending: true)
+            .limit(1)
+            .get();
+      }
+
+      if (snapshot.docs.isEmpty) {
+        throw const NotFoundException(
+          message: 'No questions found for the given criteria.',
+          code: 'question-not-found',
+        );
+      }
+
+      return _mapDocToQuestion(snapshot.docs.first);
+    }, taskName: 'getRandomQuestion');
+  }
+
+  /// Pull a set of random questions matching criteria for a full mock test.
+  Future<Result<List<QuestionModel>>> fetchRandomQuestions({
+    required String subject,
+    required String difficulty,
+    required String group,
+    int count = 10,
+  }) async {
+    return guardedTask(() async {
+      final List<QuestionModel> questions = [];
+
+      // We perform multiple random picks to ensure variety.
+      // For smaller datasets, this is still efficient.
+      for (int i = 0; i < count; i++) {
+        final seed =
+            (DateTime.now().microsecondsSinceEpoch % 1000000) / 1000000.0;
+
+        QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+            .collectionGroup('questions')
+            .where('subject', isEqualTo: subject)
+            .where('difficulty', isEqualTo: difficulty)
+            .where('group', isEqualTo: group)
+            .where('random', isGreaterThanOrEqualTo: seed)
+            .orderBy('random')
+            .limit(1)
+            .get();
+
+        if (snapshot.docs.isEmpty) {
+          snapshot = await _firestore
+              .collectionGroup('questions')
+              .where('subject', isEqualTo: subject)
+              .where('difficulty', isEqualTo: difficulty)
+              .where('group', isEqualTo: group)
+              .where('random', isLessThan: seed)
+              .orderBy('random', descending: true)
+              .limit(1)
+              .get();
+        }
+
+        if (snapshot.docs.isNotEmpty) {
+          final q = _mapDocToQuestion(snapshot.docs.first);
+          // Avoid duplicates if possible
+          if (!questions.any((existing) => existing.id == q.id)) {
+            questions.add(q);
+          }
+        }
+      }
+
+      if (questions.isEmpty) {
+        throw const NotFoundException(
+          message: 'No questions found for the given criteria.',
+          code: 'questions-not-found',
+        );
+      }
+
+      return questions;
+    }, taskName: 'fetchRandomQuestions');
+  }
+
   // ── CREATE ──
 
   /// Create a new exam (admin only).

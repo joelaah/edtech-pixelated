@@ -195,8 +195,9 @@ class AvatarStorePage extends StatelessWidget {
                                         isEquipped: isEquipped,
                                         canAfford: user.coins >= skin.price,
                                         onTap: () {
-                                          if (isEquipped || isPurchasing)
+                                          if (isEquipped || isPurchasing) {
                                             return;
+                                          }
                                           if (isUnlocked) {
                                             _handleEquip(
                                               context,

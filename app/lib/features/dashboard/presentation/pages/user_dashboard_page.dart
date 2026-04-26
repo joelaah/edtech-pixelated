@@ -13,6 +13,8 @@ import 'package:bitwise_academy/core/widgets/pixel_card.dart';
 import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:bitwise_academy/shared/models/user_entity.dart';
+import 'package:bitwise_academy/core/widgets/mock_test_config_sheet.dart';
+import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
 
 /// Hero Dashboard matching the design mockup.
 ///
@@ -93,63 +95,78 @@ class _UserDashboardPageState extends State<UserDashboardPage>
         final loaded = dashState as DashboardLoaded;
         final user = loaded.user;
 
-        return Scaffold(
-          backgroundColor: AppColors.surface,
-          appBar: _buildAppBar(context, user.xp, isAdmin: user.isAdmin),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                // ── Hero Section ──
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, val, child) => Transform.translate(
-                    offset: Offset(0, 30 * (1 - val)),
-                    child: Opacity(opacity: val, child: child),
-                  ),
-                  child: _buildHeroSection(
-                    context,
-                    userName: user.displayName,
-                    level: user.level,
-                    streakDays: user.streakDays,
-                    user: user,
-                  ),
+        return BlocListener<AttemptBloc, AttemptState>(
+          listener: (context, state) {
+            if (state is AttemptInProgress &&
+                state.exam.id.startsWith('random_mock_')) {
+              context.go('/exams/${state.exam.id}/take');
+            } else if (state is AttemptFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.error,
                 ),
-                const SizedBox(height: AppSpacing.xl),
+              );
+            }
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.surface,
+            appBar: _buildAppBar(context, user.xp, isAdmin: user.isAdmin),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                children: [
+                  // ── Hero Section ──
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, child) => Transform.translate(
+                      offset: Offset(0, 30 * (1 - val)),
+                      child: Opacity(opacity: val, child: child),
+                    ),
+                    child: _buildHeroSection(
+                      context,
+                      userName: user.displayName,
+                      level: user.level,
+                      streakDays: user.streakDays,
+                      user: user,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
 
-                // ── Stats HP Bars ──
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, val, child) => Transform.translate(
-                    offset: Offset(0, 40 * (1 - val)),
-                    child: Opacity(opacity: val, child: child),
+                  // ── Stats HP Bars ──
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, child) => Transform.translate(
+                      offset: Offset(0, 40 * (1 - val)),
+                      child: Opacity(opacity: val, child: child),
+                    ),
+                    child: _buildStatsGrid(
+                      user.xp,
+                      user.level,
+                      loaded.testsCompleted,
+                      loaded.averageScore,
+                    ),
                   ),
-                  child: _buildStatsGrid(
-                    user.xp,
-                    user.level,
-                    loaded.testsCompleted,
-                    loaded.averageScore,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.xl),
 
-                // ── Subject Grid + Active Quests ──
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, val, child) => Transform.translate(
-                    offset: Offset(0, 50 * (1 - val)),
-                    child: Opacity(opacity: val, child: child),
+                  // ── Subject Grid + Active Quests ──
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, child) => Transform.translate(
+                      offset: Offset(0, 50 * (1 - val)),
+                      child: Opacity(opacity: val, child: child),
+                    ),
+                    child: _buildBottomSection(context),
                   ),
-                  child: _buildBottomSection(context),
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-              ],
+                  const SizedBox(height: AppSpacing.xxl),
+                ],
+              ),
             ),
           ),
         );
@@ -460,11 +477,32 @@ class _UserDashboardPageState extends State<UserDashboardPage>
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              PixelButton(
-                label: 'TAKE MOCK TEST',
-                icon: Icons.bolt,
-                width: double.infinity,
-                onPressed: () => context.go('/exams'),
+              BlocBuilder<AttemptBloc, AttemptState>(
+                builder: (context, attemptState) {
+                  final isLoading = attemptState is AttemptLoadInProgress;
+                  return PixelButton(
+                    label: isLoading ? 'LOADING...' : 'TAKE MOCK TEST',
+                    icon: isLoading ? Icons.hourglass_empty : Icons.bolt,
+                    width: double.infinity,
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            final config = await showMockTestConfigSheet(
+                              context,
+                            );
+                            if (config != null && context.mounted) {
+                              context.read<AttemptBloc>().add(
+                                StartRandomMockTestRequested(
+                                  userId: user.uid,
+                                  subject: config.subject,
+                                  difficulty: config.difficulty,
+                                  group: config.group,
+                                ),
+                              );
+                            }
+                          },
+                  );
+                },
               ),
             ],
           ),

@@ -207,59 +207,69 @@ class _ExamResultsPageState extends State<ExamResultsPage>
 
                     // Rewards Section
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         // XP Reward
-                        Column(
-                          children: [
-                            Text(
-                              'XP REWARD',
-                              style: AppTypography.headlineXs.copyWith(
-                                color: AppColors.tertiary,
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                'XP REWARD',
+                                style: AppTypography.headlineXs.copyWith(
+                                  color: AppColors.tertiary,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            _xpAnimation != null
-                                ? AnimatedBuilder(
-                                    animation: _xpAnimation!,
-                                    builder: (context, child) {
-                                      return Text(
-                                        '+${_xpAnimation!.value}',
+                              const SizedBox(height: AppSpacing.sm),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: _xpAnimation != null
+                                    ? AnimatedBuilder(
+                                        animation: _xpAnimation!,
+                                        builder: (context, child) {
+                                          return Text(
+                                            '+${_xpAnimation!.value}',
+                                            style: AppTypography.headlineMd
+                                                .copyWith(
+                                                  color: AppColors.tertiary,
+                                                  fontSize: 48,
+                                                ),
+                                          );
+                                        },
+                                      )
+                                    : Text(
+                                        '+$_xpEarned',
                                         style: AppTypography.headlineMd
                                             .copyWith(
                                               color: AppColors.tertiary,
                                               fontSize: 48,
                                             ),
-                                      );
-                                    },
-                                  )
-                                : Text(
-                                    '+$_xpEarned',
-                                    style: AppTypography.headlineMd.copyWith(
-                                      color: AppColors.tertiary,
-                                      fontSize: 48,
-                                    ),
-                                  ),
-                          ],
+                                      ),
+                              ),
+                            ],
+                          ),
                         ),
                         // Coins Reward
-                        Column(
-                          children: [
-                            Text(
-                              'COINS',
-                              style: AppTypography.headlineXs.copyWith(
-                                color: Colors.amber,
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                'COINS',
+                                style: AppTypography.headlineXs.copyWith(
+                                  color: Colors.amber,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              '+$coinsEarned',
-                              style: AppTypography.headlineMd.copyWith(
-                                color: Colors.amber,
-                                fontSize: 48,
+                              const SizedBox(height: AppSpacing.sm),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '+$coinsEarned',
+                                  style: AppTypography.headlineMd.copyWith(
+                                    color: Colors.amber,
+                                    fontSize: 48,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

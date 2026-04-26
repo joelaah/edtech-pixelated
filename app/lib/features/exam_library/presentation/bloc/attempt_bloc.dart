@@ -28,6 +28,24 @@ final class StartAttemptRequested extends AttemptEvent {
   List<Object?> get props => [examId, userId];
 }
 
+/// Start a random mock test: fetches random questions from across all exams.
+final class StartRandomMockTestRequested extends AttemptEvent {
+  final String userId;
+  final String subject;
+  final String difficulty;
+  final String group;
+
+  const StartRandomMockTestRequested({
+    required this.userId,
+    required this.subject,
+    required this.difficulty,
+    required this.group,
+  });
+
+  @override
+  List<Object?> get props => [userId, subject, difficulty, group];
+}
+
 /// User selects an answer for the current question.
 final class AnswerSelected extends AttemptEvent {
   final int questionIndex;
@@ -156,6 +174,7 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
        _examRepository = examRepository,
        super(const AttemptInitial()) {
     on<StartAttemptRequested>(_onStartAttempt);
+    on<StartRandomMockTestRequested>(_onStartRandomMockTest);
     on<AnswerSelected>(_onAnswerSelected);
     on<SubmitAttemptRequested>(_onSubmitAttempt);
     on<LoadUserAttemptsRequested>(_onLoadUserAttempts);
@@ -205,6 +224,67 @@ class AttemptBloc extends Bloc<AttemptEvent, AttemptState> {
         emit(
           AttemptInProgress(
             exam: exam,
+            questions: questions,
+            attempt: data,
+            selectedAnswers: const {},
+          ),
+        );
+      case Failure(:final exception):
+        emit(AttemptFailure(message: exception.message));
+    }
+  }
+
+  Future<void> _onStartRandomMockTest(
+    StartRandomMockTestRequested event,
+    Emitter<AttemptState> emit,
+  ) async {
+    emit(const AttemptLoadInProgress());
+
+    // 1. Fetch random questions
+    final result = await _examRepository.fetchRandomQuestions(
+      subject: event.subject,
+      difficulty: event.difficulty,
+      group: event.group,
+      count: 10,
+    );
+
+    if (result is Failure<List<QuestionModel>>) {
+      emit(AttemptFailure(message: (result as Failure).exception.message));
+      return;
+    }
+    final questions = (result as Success<List<QuestionModel>>).data;
+
+    // 2. Create a virtual exam model
+    final virtualExam = ExamModel(
+      id: 'random_mock_${DateTime.now().millisecondsSinceEpoch}',
+      title: 'RANDOM MOCK TEST: ${event.subject.toUpperCase()}',
+      description: 'Automatically generated mission based on your selection.',
+      subject: event.subject,
+      difficultyTier: DifficultyTier.fromString(event.difficulty),
+      durationMinutes: 15,
+      createdBy: 'system',
+      status: ExamStatus.published,
+      xpReward: 200,
+      questionCount: questions.length,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    // 3. Calculate total points
+    final totalPoints = questions.fold<int>(0, (sum, q) => sum + q.points);
+
+    // 4. Create attempt doc in Firestore
+    final attemptResult = await _attemptRepository.startAttempt(
+      userId: event.userId,
+      examId: virtualExam.id,
+      totalPoints: totalPoints,
+    );
+
+    switch (attemptResult) {
+      case Success(:final data):
+        emit(
+          AttemptInProgress(
+            exam: virtualExam,
             questions: questions,
             attempt: data,
             selectedAnswers: const {},
