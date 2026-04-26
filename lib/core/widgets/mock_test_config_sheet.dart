@@ -67,20 +67,33 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('system').doc('mock_test_metadata').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('system')
+          .doc('mock_test_metadata')
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
 
         if (snapshot.hasError) {
-          return const Center(child: Text('Failed to load mock test configuration.'));
+          return const Center(
+            child: Text('Failed to load mock test configuration.'),
+          );
         }
 
         final data = snapshot.data?.data() ?? {};
-        final List<String> subjects = List<String>.from(data['subjects'] ?? []);
-        final List<String> groups = List<String>.from(data['groups'] ?? []);
-        final List<String> difficulties = List<String>.from(data['difficulties'] ?? []);
+        final List<String> subjects = List<String>.from(
+          (data['subjects'] as List<dynamic>?) ?? [],
+        );
+        final List<String> groups = List<String>.from(
+          (data['groups'] as List<dynamic>?) ?? [],
+        );
+        final List<String> difficulties = List<String>.from(
+          (data['difficulties'] as List<dynamic>?) ?? [],
+        );
 
         // Filter out empty options
         subjects.removeWhere((s) => s.isEmpty);
@@ -98,161 +111,165 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
             ),
           ),
           child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── Handle bar ──
-              Center(
-                child: Container(
-                  width: 48,
-                  height: 4,
-                  color: AppColors.outlineVariant,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Title ──
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                color: AppColors.primary,
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.bolt,
-                      color: AppColors.secondaryFixed,
-                      size: 20,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Handle bar ──
+                  Center(
+                    child: Container(
+                      width: 48,
+                      height: 4,
+                      color: AppColors.outlineVariant,
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      'CONFIGURE MOCK TEST',
-                      style: AppTypography.headlineXs.copyWith(
-                        color: AppColors.secondaryFixed,
-                      ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── Title ──
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Subject selector ──
-              _buildSectionLabel('SUBJECT'),
-              const SizedBox(height: AppSpacing.sm),
-              _buildPixelDropdown<String>(
-                value: _selectedSubject,
-                hint: 'Select subject...',
-                items: subjects,
-                labelBuilder: (s) => s.toUpperCase(),
-                onChanged: (v) => setState(() => _selectedSubject = v),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Group selector ──
-              _buildSectionLabel('GROUP'),
-              const SizedBox(height: AppSpacing.sm),
-              _buildPixelDropdown<String>(
-                value: _selectedGroup,
-                hint: 'Select group...',
-                items: groups,
-                labelBuilder: (s) => s.toUpperCase(),
-                onChanged: (v) => setState(() => _selectedGroup = v),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Difficulty selector (chip-style) ──
-              _buildSectionLabel('DIFFICULTY'),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: difficulties.map((d) {
-                  final isSelected = _selectedDifficulty == d;
-                  final color =
-                      _difficultyColors[d] ?? AppColors.onSurfaceVariant;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedDifficulty = d),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? color.withValues(alpha: 0.15)
-                            : AppColors.surfaceContainerLowest,
-                        border: Border.all(
-                          color: isSelected ? color : AppColors.outlineVariant,
-                          width: isSelected ? 3 : 2,
+                    color: AppColors.primary,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.bolt,
+                          color: AppColors.secondaryFixed,
+                          size: 20,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: isSelected ? color : Colors.transparent,
-                              border: Border.all(color: color, width: 2),
-                            ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 10,
-                                    color: Colors.white,
-                                  )
-                                : null,
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'CONFIGURE MOCK TEST',
+                          style: AppTypography.headlineXs.copyWith(
+                            color: AppColors.secondaryFixed,
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            _difficultyLabels[d] ?? d.toUpperCase(),
-                            style: AppTypography.headlineXs.copyWith(
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── Subject selector ──
+                  _buildSectionLabel('SUBJECT'),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildPixelDropdown<String>(
+                    value: _selectedSubject,
+                    hint: 'Select subject...',
+                    items: subjects,
+                    labelBuilder: (s) => s.toUpperCase(),
+                    onChanged: (v) => setState(() => _selectedSubject = v),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── Group selector ──
+                  _buildSectionLabel('GROUP'),
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildPixelDropdown<String>(
+                    value: _selectedGroup,
+                    hint: 'Select group...',
+                    items: groups,
+                    labelBuilder: (s) => s.toUpperCase(),
+                    onChanged: (v) => setState(() => _selectedGroup = v),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── Difficulty selector (chip-style) ──
+                  _buildSectionLabel('DIFFICULTY'),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: difficulties.map((d) {
+                      final isSelected = _selectedDifficulty == d;
+                      final color =
+                          _difficultyColors[d] ?? AppColors.onSurfaceVariant;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedDifficulty = d),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? color.withValues(alpha: 0.15)
+                                : AppColors.surfaceContainerLowest,
+                            border: Border.all(
                               color: isSelected
                                   ? color
-                                  : AppColors.onSurfaceVariant,
+                                  : AppColors.outlineVariant,
+                              width: isSelected ? 3 : 2,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppSpacing.xl),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? color
+                                      : Colors.transparent,
+                                  border: Border.all(color: color, width: 2),
+                                ),
+                                child: isSelected
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 10,
+                                        color: Colors.white,
+                                      )
+                                    : null,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                _difficultyLabels[d] ?? d.toUpperCase(),
+                                style: AppTypography.headlineXs.copyWith(
+                                  color: isSelected
+                                      ? color
+                                      : AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
 
-              // ── Start button ──
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: _isValid ? 1.0 : 0.4,
-                child: PixelButton(
-                  label: 'START MISSION',
-                  icon: Icons.play_arrow,
-                  width: double.infinity,
-                  onPressed: _isValid
-                      ? () {
-                          Navigator.of(context).pop(
-                            MockTestConfig(
-                              subject: _selectedSubject!,
-                              difficulty: _selectedDifficulty!,
-                              group: _selectedGroup!,
-                            ),
-                          );
-                        }
-                      : null,
-                ),
+                  // ── Start button ──
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: _isValid ? 1.0 : 0.4,
+                    child: PixelButton(
+                      label: 'START MISSION',
+                      icon: Icons.play_arrow,
+                      width: double.infinity,
+                      onPressed: _isValid
+                          ? () {
+                              Navigator.of(context).pop(
+                                MockTestConfig(
+                                  subject: _selectedSubject!,
+                                  difficulty: _selectedDifficulty!,
+                                  group: _selectedGroup!,
+                                ),
+                              );
+                            }
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
               ),
-              const SizedBox(height: AppSpacing.sm),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
       },
     );
   }
