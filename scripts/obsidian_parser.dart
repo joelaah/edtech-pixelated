@@ -206,7 +206,7 @@ Map<String, dynamic> _extractFrontmatter(String content) {
     final colonIndex = trimmedLine.indexOf(':');
     if (colonIndex == -1) continue;
 
-    final key = trimmedLine.substring(0, colonIndex).trim();
+    final key = trimmedLine.substring(0, colonIndex).trim().toLowerCase();
     var value = trimmedLine.substring(colonIndex + 1).trim();
 
     // Strip surrounding quotes

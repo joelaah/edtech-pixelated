@@ -394,118 +394,120 @@ class _QuestPageState extends State<QuestPage> {
     if (quest.iconName == 'bolt') iconData = Icons.bolt;
     if (quest.iconName == 'check_circle') iconData = Icons.check_circle;
     if (quest.iconName == 'quiz') iconData = Icons.quiz;
-    if (quest.iconName == 'local_fire_department') iconData = Icons.local_fire_department;
+    if (quest.iconName == 'local_fire_department') {
+      iconData = Icons.local_fire_department;
+    }
     if (quest.iconName == 'school') iconData = Icons.school;
 
     return PixelCard(
-      borderColor: isCompleted ? color : AppColors.primary,
-      backgroundColor: isCompleted
-          ? color.withValues(alpha: 0.1)
-          : AppColors.surfaceContainerLowest,
-      badge: isCompleted ? 'DONE' : null,
-      badgeColor: color,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          borderColor: isCompleted ? color : AppColors.primary,
+          backgroundColor: isCompleted
+              ? color.withValues(alpha: 0.1)
+              : AppColors.surfaceContainerLowest,
+          badge: isCompleted ? 'DONE' : null,
+          badgeColor: color,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isCompleted ? color : AppColors.surfaceContainerHigh,
-                  border: Border.all(color: color, width: 2),
-                ),
-                child: Icon(
-                  isCompleted ? Icons.check : iconData,
-                  color: isCompleted ? Colors.white : color,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      quest.title,
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? color
+                          : AppColors.surfaceContainerHigh,
+                      border: Border.all(color: color, width: 2),
+                    ),
+                    child: Icon(
+                      isCompleted ? Icons.check : iconData,
+                      color: isCompleted ? Colors.white : color,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          quest.title,
+                          style: AppTypography.headlineXs.copyWith(
+                            color: isCompleted ? color : AppColors.onSurface,
+                            decoration: isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                        Text(
+                          quest.description,
+                          style: AppTypography.bodyMd.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
+                    color: AppColors.secondaryContainer,
+                    child: Text(
+                      '+${quest.xpReward} XP',
                       style: AppTypography.headlineXs.copyWith(
-                        color: isCompleted ? color : AppColors.onSurface,
-                        decoration: isCompleted
-                            ? TextDecoration.lineThrough
-                            : null,
+                        color: AppColors.onSecondaryContainer,
+                        fontSize: 8,
                       ),
                     ),
-                    Text(
-                      quest.description,
-                      style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 2,
-                ),
-                color: AppColors.secondaryContainer,
-                child: Text(
-                  '+${quest.xpReward} XP',
-                  style: AppTypography.headlineXs.copyWith(
-                    color: AppColors.onSecondaryContainer,
-                    fontSize: 8,
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
 
-          // Progress bar
-          if (!isCompleted) ...[
-            const SizedBox(height: AppSpacing.md),
-            Stack(
-              children: [
-                Container(
-                  height: 12,
-                  width: double.infinity,
-                  color: AppColors.surfaceContainerHighest,
-                ),
-                // Animated Progress Bar
-                Container(
-                  height: 12,
-                  width: double.infinity,
-                  color: Colors.transparent,
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: progress,
-                    child: Container(color: color),
-                  ),
-                )
-                    .animate()
-                    .scaleX(
+              // Progress bar
+              if (!isCompleted) ...[
+                const SizedBox(height: AppSpacing.md),
+                Stack(
+                  children: [
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      color: AppColors.surfaceContainerHighest,
+                    ),
+                    // Animated Progress Bar
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      color: Colors.transparent,
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: progress,
+                        child: Container(color: color),
+                      ),
+                    ).animate().scaleX(
                       duration: 800.ms,
                       curve: Curves.easeOutBack,
                       alignment: Alignment.centerLeft,
                       begin: 0,
                     ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '${(progress * 100).toInt()}%',
-                style: AppTypography.labelSm.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    )
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${(progress * 100).toInt()}%',
+                    style: AppTypography.labelSm.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        )
         .animate()
         .fadeIn(duration: 400.ms)
         .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuad);

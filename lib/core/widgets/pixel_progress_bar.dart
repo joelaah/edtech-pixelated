@@ -47,10 +47,7 @@ class PixelProgressBar extends StatelessWidget {
                     ),
                   ),
                 if (valueText != null)
-                  Text(
-                    valueText!,
-                    style: AppTypography.headlineXs,
-                  ),
+                  Text(valueText!, style: AppTypography.headlineXs),
               ],
             ),
           ),

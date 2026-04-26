@@ -237,10 +237,11 @@ class _ExamResultsPageState extends State<ExamResultsPage>
                                       )
                                     : Text(
                                         '+$_xpEarned',
-                                        style: AppTypography.headlineMd.copyWith(
-                                          color: AppColors.tertiary,
-                                          fontSize: 48,
-                                        ),
+                                        style: AppTypography.headlineMd
+                                            .copyWith(
+                                              color: AppColors.tertiary,
+                                              fontSize: 48,
+                                            ),
                                       ),
                               ),
                             ],

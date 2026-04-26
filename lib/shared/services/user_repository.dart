@@ -190,6 +190,34 @@ class UserRepository {
     }
   }
 
+  /// Fetch leaderboard (top users by XP).
+  ///
+  /// Uses a single-field orderBy to avoid needing a compound index.
+  /// Admin users are filtered out client-side.
+  Future<Result<List<UserEntity>>> fetchLeaderboard({int limit = 50}) async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _usersCollection
+              .orderBy('xp', descending: true)
+              .limit(limit)
+              .get();
+      final List<UserEntity> users = snapshot.docs
+          .map(_mapDocToUser)
+          .where((user) => user.role == UserRole.student)
+          .toList();
+      return Success<List<UserEntity>>(users);
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.instance.e('fetchLeaderboard failed', error: e);
+      return Failure<List<UserEntity>>(
+        FirestoreException(
+          message: e.message ?? 'Failed to fetch leaderboard',
+          code: e.code,
+          stackTrace: stackTrace,
+        ),
+      );
+    }
+  }
+
   /// Fetch all users (admin).
   Future<Result<List<UserEntity>>> fetchAllUsers() async {
     try {

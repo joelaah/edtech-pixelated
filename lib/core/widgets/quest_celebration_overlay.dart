@@ -22,7 +22,8 @@ class QuestCelebrationOverlay extends StatefulWidget {
   });
 
   @override
-  State<QuestCelebrationOverlay> createState() => _QuestCelebrationOverlayState();
+  State<QuestCelebrationOverlay> createState() =>
+      _QuestCelebrationOverlayState();
 }
 
 class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
@@ -31,12 +32,14 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
     _confettiController.play();
-    
+
     // Trigger heavy haptic feedback for the achievement "kick"
     HapticFeedback.heavyImpact();
-    
+
     // Auto-dismiss after 4 seconds
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) widget.onDismiss();
@@ -100,33 +103,33 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
               children: [
                 // "QUEST CLEAR" Banner
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xl,
-                    vertical: AppSpacing.md,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary,
-                    border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.secondary.withValues(alpha: 0.5),
-                        offset: const Offset(8, 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    'QUEST CLEAR!',
-                    style: AppTypography.headlineMd.copyWith(
-                      color: Colors.white,
-                      shadows: [
-                        const Shadow(
-                          color: Colors.black,
-                          offset: Offset(4, 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary,
+                        border: Border.all(color: Colors.white, width: 4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.secondary.withValues(alpha: 0.5),
+                            offset: const Offset(8, 8),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'QUEST CLEAR!',
+                        style: AppTypography.headlineMd.copyWith(
+                          color: Colors.white,
+                          shadows: [
+                            const Shadow(
+                              color: Colors.black,
+                              offset: Offset(4, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                )
+                      ),
+                    )
                     .animate()
                     .scale(
                       duration: 400.ms,
@@ -140,30 +143,34 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
 
                 // Quest Title & Reward
                 Column(
-                  children: [
-                    Text(
-                      widget.questTitle.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: AppTypography.headlineSm.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star, color: Colors.yellow, size: 32),
-                        const SizedBox(width: AppSpacing.sm),
                         Text(
-                          '+${widget.xpAwarded} XP',
-                          style: AppTypography.headlineMd.copyWith(
-                            color: AppColors.primaryContainer,
+                          widget.questTitle.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: AppTypography.headlineSm.copyWith(
+                            color: Colors.white,
                           ),
                         ),
+                        const SizedBox(height: AppSpacing.md),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 32,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              '+${widget.xpAwarded} XP',
+                              style: AppTypography.headlineMd.copyWith(
+                                color: AppColors.primaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
-                    ),
-                  ],
-                )
+                    )
                     .animate(delay: 600.ms)
                     .fadeIn(duration: 400.ms)
                     .slideY(begin: 0.2, end: 0),
@@ -172,12 +179,14 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
 
                 // Press to Continue (Tap anywhere)
                 Text(
-                  'TAP TO CONTINUE',
-                  style: AppTypography.labelLg.copyWith(
-                    color: Colors.white.withValues(alpha: 0.6),
-                  ),
-                )
-                    .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                      'TAP TO CONTINUE',
+                      style: AppTypography.labelLg.copyWith(
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
+                    )
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
                     .fadeIn(duration: 800.ms),
               ],
             ),

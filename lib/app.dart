@@ -9,6 +9,7 @@ import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/exam_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
 import 'package:bitwise_academy/features/quest/presentation/bloc/quest_bloc.dart';
+import 'package:bitwise_academy/features/leaderboard/presentation/bloc/leaderboard_bloc.dart';
 import 'package:bitwise_academy/core/widgets/quest_celebration_overlay.dart';
 
 /// Root application widget.
@@ -46,8 +47,10 @@ class _RimsAppState extends State<RimsApp> {
         ),
         BlocProvider<AttemptBloc>(create: (_) => getIt<AttemptBloc>()),
         BlocProvider<QuestBloc>(
-          create: (_) => getIt<QuestBloc>()..add(const LoadActiveQuestsRequested()),
+          create: (_) =>
+              getIt<QuestBloc>()..add(const LoadActiveQuestsRequested()),
         ),
+        BlocProvider<LeaderboardBloc>(create: (_) => getIt<LeaderboardBloc>()),
       ],
       child: BlocListener<QuestBloc, QuestState>(
         listenWhen: (previous, current) => current is QuestXpAwardSuccess,

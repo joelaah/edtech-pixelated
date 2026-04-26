@@ -263,7 +263,9 @@ class _ExamDetailPageState extends State<ExamDetailPage> {
             fit: BoxFit.scaleDown,
             child: Text(
               value,
-              style: AppTypography.headlineSm.copyWith(color: AppColors.primary),
+              style: AppTypography.headlineSm.copyWith(
+                color: AppColors.primary,
+              ),
             ),
           ),
           const SizedBox(height: 2),
