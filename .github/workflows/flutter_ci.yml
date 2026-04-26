@@ -10,12 +10,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: app
 
     steps:
       - uses: actions/checkout@v4
@@ -24,16 +20,19 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
           
       - name: Install dependencies
         run: flutter pub get
+        working-directory: app
 
       - name: Check formatting
-        run: dart format --set-exit-if-changed .
+        run: flutter format --set-exit-if-changed .
+        working-directory: app
 
       - name: Analyze code
         run: flutter analyze
+        working-directory: app
 
       - name: Run tests
         run: flutter test
+        working-directory: app
