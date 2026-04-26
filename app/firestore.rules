@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ──
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isValidRole(role) {
+      return role in ['student', 'admin'];
+    }
+
+    // ── Users Collection ──
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if (isOwner(uid) && request.resource.data.role == 'student') || isAdmin();
+      allow update: if (isOwner(uid) && request.resource.data.role == resource.data.role) || 
+                       (isAdmin() && isValidRole(request.resource.data.role));
+      allow delete: if false;
+    }
+
+    // ── Exams Collection ──
+    match /exams/{examId} {
+      allow read: if isSignedIn() &&
+        (resource.data.status == 'published' || isAdmin());
+      allow create, update, delete: if isAdmin();
+
+      // ── Questions Subcollection ──
+      match /questions/{questionId} {
+        allow read: if isAdmin() || 
+                    (isSignedIn() && get(/databases/$(database)/documents/exams/$(examId)).data.status == 'published');
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // ── Attempts Collection ──
+    match /attempts/{attemptId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId) &&
+        resource.data.status == 'in_progress' &&
+        request.resource.data.userId == resource.data.userId; 
+      allow delete: if false;
+    }
+
+    // ── Quests Collection ──
+    match /quests/{questId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── Skins Collection (Avatar Store) ──
+    match /skins/{skinId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── System Config ──
+    match /system/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
