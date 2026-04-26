@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:firebase_admin_sdk/firebase_admin_sdk.dart' as admin;
 
 void main() async {
@@ -51,6 +52,10 @@ void main() async {
     print(
       '🚀 Starting optimized upload of ${exams.length} exams to project: $projectId...',
     );
+
+    final Set<String> uniqueSubjects = {};
+    final Set<String> uniqueGroups = {};
+    final Set<String> uniqueDifficulties = {};
 
     for (int i = 0; i < exams.length; i++) {
       final Map<String, dynamic> examData = Map<String, dynamic>.from(
@@ -102,6 +107,11 @@ void main() async {
       final examRef = firestore.collection('exams').doc();
       batch.set(examRef, examDoc);
 
+      // Update unique lists
+      uniqueSubjects.add((examDoc['subject'] as String?) ?? 'General');
+      uniqueGroups.add((examDoc['group'] as String?) ?? '');
+      uniqueDifficulties.add((examDoc['difficultyTier'] as String?) ?? 'medium');
+
       // Add questions to batch
       for (final dynamic q in questions) {
         final Map<String, dynamic> qData = Map<String, dynamic>.from(
@@ -116,8 +126,7 @@ void main() async {
         qData['group'] = examDoc['group'];
 
         // Add random seed for selection
-        qData['random'] =
-            (DateTime.now().microsecondsSinceEpoch % 1000000) / 1000000.0;
+        qData['random'] = Random().nextDouble();
 
         final qRef = examRef.collection('questions').doc();
         batch.set(qRef, qData);
@@ -129,6 +138,27 @@ void main() async {
       await batch.commit();
       print('   ✅ Success! Document ID: ${examRef.id}');
     }
+
+    print('\n🔄 Updating central mock_test_metadata...');
+    final configRef = firestore.collection('system').doc('mock_test_metadata');
+    try {
+      final configSnapshot = await configRef.get();
+      final existingData = configSnapshot.data();
+      if (existingData != null) {
+        uniqueSubjects.addAll(List<String>.from((existingData['subjects'] as List<dynamic>?) ?? []));
+        uniqueGroups.addAll(List<String>.from((existingData['groups'] as List<dynamic>?) ?? []));
+        uniqueDifficulties.addAll(List<String>.from((existingData['difficulties'] as List<dynamic>?) ?? []));
+      }
+    } catch (e) {
+      print('   ℹ️ Creating new mock_test_metadata document.');
+    }
+
+    await configRef.set({
+      'subjects': uniqueSubjects.toList(),
+      'groups': uniqueGroups.toList(),
+      'difficulties': uniqueDifficulties.toList(),
+    });
+    print('✅ Metadata updated successfully.');
 
     print('\n==================================================');
     print('🎉 ALL TASKS COMPLETED SUCCESSFULLY');

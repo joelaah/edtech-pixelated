@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:bitwise_academy/core/constants/app_colors.dart';
 import 'package:bitwise_academy/core/constants/app_spacing.dart';
@@ -42,35 +43,6 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
   String? _selectedDifficulty;
   String? _selectedGroup;
 
-  // Placeholder lists — update these to match your Obsidian frontmatter values.
-  static const List<String> _subjects = [
-    'Mathematics',
-    'Reasoning',
-    'English',
-    'General Knowledge',
-    'Science',
-    'History',
-    'Geography',
-    'Polity',
-    'Economics',
-  ];
-
-  static const List<String> _groups = [
-    'MPSC Group A',
-    'MPSC Group B',
-    'MPSC Group C',
-    'SSC CGL',
-    'SSC CHSL',
-    'Practice',
-  ];
-
-  static const List<String> _difficulties = [
-    'easy',
-    'medium',
-    'hard',
-    'ultra_hard',
-  ];
-
   static const Map<String, String> _difficultyLabels = {
     'easy': 'EASY',
     'medium': 'MEDIUM',
@@ -94,17 +66,38 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.primary, width: 4),
-          left: BorderSide(color: AppColors.primary, width: 4),
-          right: BorderSide(color: AppColors.primary, width: 4),
-        ),
-      ),
-      child: SafeArea(
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('system').doc('mock_test_metadata').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+        }
+
+        if (snapshot.hasError) {
+          return const Center(child: Text('Failed to load mock test configuration.'));
+        }
+
+        final data = snapshot.data?.data() ?? {};
+        final List<String> subjects = List<String>.from((data['subjects'] as List<dynamic>?) ?? []);
+        final List<String> groups = List<String>.from((data['groups'] as List<dynamic>?) ?? []);
+        final List<String> difficulties = List<String>.from((data['difficulties'] as List<dynamic>?) ?? []);
+
+        // Filter out empty options
+        subjects.removeWhere((s) => s.isEmpty);
+        groups.removeWhere((s) => s.isEmpty);
+        difficulties.removeWhere((s) => s.isEmpty);
+
+        return Container(
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(
+              top: BorderSide(color: AppColors.primary, width: 4),
+              left: BorderSide(color: AppColors.primary, width: 4),
+              right: BorderSide(color: AppColors.primary, width: 4),
+            ),
+          ),
+          child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
@@ -153,7 +146,7 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
               _buildPixelDropdown<String>(
                 value: _selectedSubject,
                 hint: 'Select subject...',
-                items: _subjects,
+                items: subjects,
                 labelBuilder: (s) => s.toUpperCase(),
                 onChanged: (v) => setState(() => _selectedSubject = v),
               ),
@@ -165,7 +158,7 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
               _buildPixelDropdown<String>(
                 value: _selectedGroup,
                 hint: 'Select group...',
-                items: _groups,
+                items: groups,
                 labelBuilder: (s) => s.toUpperCase(),
                 onChanged: (v) => setState(() => _selectedGroup = v),
               ),
@@ -177,7 +170,7 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
               Wrap(
                 spacing: AppSpacing.sm,
                 runSpacing: AppSpacing.sm,
-                children: _difficulties.map((d) {
+                children: difficulties.map((d) {
                   final isSelected = _selectedDifficulty == d;
                   final color =
                       _difficultyColors[d] ?? AppColors.onSurfaceVariant;
@@ -259,6 +252,8 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 

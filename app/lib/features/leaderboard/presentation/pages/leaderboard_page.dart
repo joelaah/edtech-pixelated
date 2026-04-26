@@ -4,6 +4,7 @@ import 'package:bitwise_academy/core/constants/app_colors.dart';
 import 'package:bitwise_academy/core/constants/app_spacing.dart';
 import 'package:bitwise_academy/core/constants/app_typography.dart';
 import 'package:bitwise_academy/core/widgets/pixel_card.dart';
+import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/leaderboard/presentation/bloc/leaderboard_bloc.dart';
 import 'package:bitwise_academy/shared/models/user_entity.dart';
 
@@ -108,7 +109,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final user = state.topUsers[index];
-                      return _buildLeaderboardTile(user, index + 1);
+                      return _buildLeaderboardTile(context, user, index + 1);
                     }, childCount: state.topUsers.length),
                   ),
                 ),
@@ -154,19 +155,31 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     );
   }
 
-  Widget _buildLeaderboardTile(UserEntity user, int rank) {
+  Widget _buildLeaderboardTile(
+    BuildContext context,
+    UserEntity user,
+    int rank,
+  ) {
     Color rankColor = AppColors.primary;
     if (rank == 1) rankColor = Colors.amber;
     if (rank == 2) rankColor = Colors.grey;
     if (rank == 3) rankColor = Colors.brown;
 
+    final authState = context.read<AuthBloc>().state;
+    final isCurrentUser =
+        authState is AuthAuthenticated && authState.user.uid == user.uid;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: PixelCard(
-        borderColor: rank <= 3 ? rankColor : AppColors.outlineVariant,
-        backgroundColor: rank == 1
-            ? Colors.amber.withValues(alpha: 0.05)
-            : AppColors.surfaceContainerLowest,
+        borderColor: isCurrentUser
+            ? AppColors.primary
+            : (rank <= 3 ? rankColor : AppColors.outlineVariant),
+        backgroundColor: isCurrentUser
+            ? AppColors.primaryContainer.withValues(alpha: 0.3)
+            : (rank == 1
+                  ? Colors.amber.withValues(alpha: 0.05)
+                  : AppColors.surfaceContainerLowest),
         child: Row(
           children: [
             Container(
