@@ -116,7 +116,7 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
                   ),
                   child: Text(
                     'QUEST CLEAR!',
-                    style: AppTypography.headlineMedium.copyWith(
+                    style: AppTypography.headlineMd.copyWith(
                       color: Colors.white,
                       shadows: [
                         const Shadow(
@@ -144,7 +144,7 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
                     Text(
                       widget.questTitle.toUpperCase(),
                       textAlign: TextAlign.center,
-                      style: AppTypography.headlineSmall.copyWith(
+                      style: AppTypography.headlineSm.copyWith(
                         color: Colors.white,
                       ),
                     ),
@@ -156,7 +156,7 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           '+${widget.xpAwarded} XP',
-                          style: AppTypography.headlineMedium.copyWith(
+                          style: AppTypography.headlineMd.copyWith(
                             color: AppColors.primaryContainer,
                           ),
                         ),
@@ -173,7 +173,7 @@ class _QuestCelebrationOverlayState extends State<QuestCelebrationOverlay> {
                 // Press to Continue (Tap anywhere)
                 Text(
                   'TAP TO CONTINUE',
-                  style: AppTypography.labelLarge.copyWith(
+                  style: AppTypography.labelLg.copyWith(
                     color: Colors.white.withValues(alpha: 0.6),
                   ),
                 )
