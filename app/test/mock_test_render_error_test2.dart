@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bitwise_academy/core/widgets/pixel_button.dart';
 
 void main() {
-  testWidgets('Test PixelButton width double.infinity', (WidgetTester tester) async {
+  testWidgets('Test PixelButton width double.infinity', (
+    WidgetTester tester,
+  ) async {
     bool isValid = false;
 
     await tester.pumpWidget(
@@ -26,7 +28,7 @@ void main() {
                   ),
                 ],
               );
-            }
+            },
           ),
         ),
       ),
@@ -35,7 +37,7 @@ void main() {
     // Tap to select
     await tester.tap(find.text('Click Me'));
     await tester.pumpAndSettle();
-    
+
     expect(tester.takeException(), isNull);
   });
 }
