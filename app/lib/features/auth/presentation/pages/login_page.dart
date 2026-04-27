@@ -1,4 +1,4 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -263,15 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                   ),
                 ],
-                const SizedBox(height: AppSpacing.xxl),
-                // DEBUG: Crash button
-                if (kDebugMode)
-                  PixelButton(
-                    label: 'DEBUG: TRIGGER CRASH',
-                    onPressed: () => FirebaseCrashlytics.instance.crash(),
-                    isPrimary: false,
-                    width: double.infinity,
-                  ),
+
               ],
             ),
           ),
