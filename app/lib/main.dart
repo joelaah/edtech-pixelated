@@ -29,7 +29,7 @@ Future<void> main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Initialize Crashlytics
   FlutterError.onError = (errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
@@ -40,7 +40,9 @@ Future<void> main() async {
     return true;
   };
 
-  AppLogger.instance.i('Firebase and Crashlytics initialized for project: edtech-3f6fe');
+  AppLogger.instance.i(
+    'Firebase and Crashlytics initialized for project: edtech-3f6fe',
+  );
 
   // Setup Firebase Sandbox / Emulators
   // IMPORTANT: Emulator connections MUST be established BEFORE any other

@@ -55,8 +55,10 @@ class _QuestPageState extends State<QuestPage> {
           if (questState is QuestLoadInProgress) {
             return const Scaffold(
               backgroundColor: AppColors.surface,
-              body: Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+              body: SafeArea(
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
               ),
             );
           }
@@ -64,39 +66,41 @@ class _QuestPageState extends State<QuestPage> {
           if (questState is QuestLoadFailure) {
             return Scaffold(
               backgroundColor: AppColors.surface,
-              body: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  margin: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerHigh,
-                    border: Border.all(color: AppColors.error, width: 4),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.warning_amber_rounded,
-                        color: AppColors.error,
-                        size: 48,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        'GLITCH IN THE MATRIX',
-                        style: AppTypography.headlineSm.copyWith(
+              body: SafeArea(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    margin: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerHigh,
+                      border: Border.all(color: AppColors.error, width: 4),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
                           color: AppColors.error,
+                          size: 48,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Failed to load quests. Please try again later.\n[ ${questState.message} ]',
-                        style: AppTypography.bodyLg.copyWith(
-                          color: AppColors.onSurface,
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'GLITCH IN THE MATRIX',
+                          style: AppTypography.headlineSm.copyWith(
+                            color: AppColors.error,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Failed to load quests. Please try again later.\n[ ${questState.message} ]',
+                          style: AppTypography.bodyLg.copyWith(
+                            color: AppColors.onSurface,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -177,162 +181,165 @@ class _QuestPageState extends State<QuestPage> {
 
               return Scaffold(
                 backgroundColor: AppColors.surface,
-                body: CustomScrollView(
-                  slivers: [
-                    // Header
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        color: AppColors.primary,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'QUEST LOG',
-                                  style: AppTypography.headlineSm.copyWith(
-                                    color: AppColors.secondaryFixed,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.md,
-                                    vertical: AppSpacing.xs,
-                                  ),
-                                  color: AppColors.secondaryContainer,
-                                  child: Text(
-                                    '$completedQuests/$totalQuests COMPLETE',
-                                    style: AppTypography.headlineXs.copyWith(
-                                      color: AppColors.onSecondaryContainer,
+                body: SafeArea(
+                  child: CustomScrollView(
+                    slivers: [
+                      // Header
+                      SliverToBoxAdapter(
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          color: AppColors.primary,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'QUEST LOG',
+                                    style: AppTypography.headlineSm.copyWith(
+                                      color: AppColors.secondaryFixed,
                                     ),
                                   ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    color: AppColors.secondaryContainer,
+                                    child: Text(
+                                      '$completedQuests/$totalQuests COMPLETE',
+                                      style: AppTypography.headlineXs.copyWith(
+                                        color: AppColors.onSecondaryContainer,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                'Complete objectives to earn bonus XP and unlock achievements.',
+                                style: AppTypography.bodyLg.copyWith(
+                                  color: AppColors.onPrimaryContainer,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // ── Daily Quests ──
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Text(
+                            'DAILY MISSIONS',
+                            style: AppTypography.headlineXs.copyWith(
+                              color: AppColors.primary,
                             ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              'Complete objectives to earn bonus XP and unlock achievements.',
+                          ),
+                        ),
+                      ),
+                      if (dailyQuests.isEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                            ),
+                            child: Text(
+                              'No daily missions available.',
                               style: AppTypography.bodyLg.copyWith(
-                                color: AppColors.onPrimaryContainer,
+                                color: AppColors.onSurfaceVariant,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // ── Daily Quests ──
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
-                          'DAILY MISSIONS',
-                          style: AppTypography.headlineXs.copyWith(
-                            color: AppColors.primary,
                           ),
-                        ),
-                      ),
-                    ),
-                    if (dailyQuests.isEmpty)
-                      SliverToBoxAdapter(
-                        child: Padding(
+                        )
+                      else
+                        SliverPadding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
                           ),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.sm,
+                                ),
+                                child: _buildLiveQuestCard(
+                                  quest: dailyQuests[index],
+                                  color: AppColors.secondary,
+                                  streakDays: streakDays,
+                                  testsCompleted: testsCompleted,
+                                ),
+                              );
+                            }, childCount: dailyQuests.length),
+                          ),
+                        ),
+
+                      // ── Weekly Quests ──
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.md,
+                            AppSpacing.xl,
+                            AppSpacing.md,
+                            AppSpacing.md,
+                          ),
                           child: Text(
-                            'No daily missions available.',
-                            style: AppTypography.bodyLg.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                            'WEEKLY CAMPAIGNS',
+                            style: AppTypography.headlineXs.copyWith(
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
-                      )
-                    else
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                        ),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: AppSpacing.sm,
-                              ),
-                              child: _buildLiveQuestCard(
-                                quest: dailyQuests[index],
-                                color: AppColors.secondary,
-                                streakDays: streakDays,
-                                testsCompleted: testsCompleted,
-                              ),
-                            );
-                          }, childCount: dailyQuests.length),
-                        ),
                       ),
-
-                    // ── Weekly Quests ──
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.md,
-                          AppSpacing.xl,
-                          AppSpacing.md,
-                          AppSpacing.md,
-                        ),
-                        child: Text(
-                          'WEEKLY CAMPAIGNS',
-                          style: AppTypography.headlineXs.copyWith(
-                            color: AppColors.primary,
+                      if (weeklyQuests.isEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                            ),
+                            child: Text(
+                              'No weekly campaigns available.',
+                              style: AppTypography.bodyLg.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    if (weeklyQuests.isEmpty)
-                      SliverToBoxAdapter(
-                        child: Padding(
+                        )
+                      else
+                        SliverPadding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
                           ),
-                          child: Text(
-                            'No weekly campaigns available.',
-                            style: AppTypography.bodyLg.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.sm,
+                                ),
+                                child: _buildLiveQuestCard(
+                                  quest: weeklyQuests[index],
+                                  color: AppColors.tertiary,
+                                  streakDays: streakDays,
+                                  testsCompleted: testsCompleted,
+                                ),
+                              );
+                            }, childCount: weeklyQuests.length),
                           ),
                         ),
-                      )
-                    else
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                        ),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: AppSpacing.sm,
-                              ),
-                              child: _buildLiveQuestCard(
-                                quest: weeklyQuests[index],
-                                color: AppColors.tertiary,
-                                streakDays: streakDays,
-                                testsCompleted: testsCompleted,
-                              ),
-                            );
-                          }, childCount: weeklyQuests.length),
-                        ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: AppSpacing.xxl),
                       ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: AppSpacing.xxl),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
