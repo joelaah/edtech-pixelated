@@ -8,7 +8,6 @@ import 'package:bitwise_academy/features/auth/data/datasources/auth_remote_datas
 import 'package:bitwise_academy/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bitwise_academy/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:bitwise_academy/features/exam_library/presentation/bloc/exam_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/data/repositories/attempt_repository.dart';
 import 'package:bitwise_academy/features/exam_library/data/repositories/exam_repository.dart';
@@ -80,9 +79,6 @@ Future<void> configureDependencies() async {
   // ── 4. BLoCs / Cubits ──
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(authRepository: getIt<AuthRepository>()),
-  );
-  getIt.registerFactory<ExamBloc>(
-    () => ExamBloc(examRepository: getIt<ExamRepository>()),
   );
   getIt.registerFactory<AttemptBloc>(
     () => AttemptBloc(

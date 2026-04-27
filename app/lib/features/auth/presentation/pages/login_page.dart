@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:go_router/go_router.dart';
 
 import 'package:bitwise_academy/core/constants/app_colors.dart';
@@ -262,6 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                   ),
                 ],
+                const SizedBox(height: AppSpacing.lg),
               ],
             ),
           ),

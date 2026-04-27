@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
 /// Singleton logger instance for the app.
@@ -20,6 +21,6 @@ abstract final class AppLogger {
       printEmojis: true,
       dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
-    level: Level.debug, // TODO: Set to Level.warning in production
+    level: kReleaseMode ? Level.warning : Level.debug,
   );
 }

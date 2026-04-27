@@ -8,8 +8,7 @@ import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:bitwise_academy/features/auth/presentation/pages/login_page.dart';
 import 'package:bitwise_academy/features/auth/presentation/pages/register_page.dart';
 import 'package:bitwise_academy/features/dashboard/presentation/pages/user_dashboard_page.dart';
-import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_list_page.dart';
-import 'package:bitwise_academy/features/exam_library/presentation/pages/exam_detail_page.dart';
+
 import 'package:bitwise_academy/features/quest/presentation/pages/quest_page.dart';
 import 'package:bitwise_academy/features/admin/presentation/pages/admin_dashboard_page.dart';
 import 'package:bitwise_academy/features/admin/presentation/pages/create_exam_page.dart';
@@ -32,8 +31,7 @@ abstract final class RoutePaths {
   static const String login = '/login';
   static const String register = '/register';
   static const String dashboard = '/';
-  static const String exams = '/exams';
-  static const String examDetail = '/exams/:examId';
+
   static const String examTaking = '/exams/:examId/take';
   static const String examResults = '/exams/:examId/results';
   static const String quests = '/quests';
@@ -150,18 +148,7 @@ GoRouter buildRouter(AuthBloc authBloc) {
               );
             },
           ),
-          GoRoute(
-            path: RoutePaths.exams,
-            name: 'exams',
-            builder: (BuildContext context, GoRouterState state) =>
-                const ExamListPage(),
-          ),
-          GoRoute(
-            path: RoutePaths.examDetail,
-            name: 'examDetail',
-            builder: (BuildContext context, GoRouterState state) =>
-                ExamDetailPage(examId: state.pathParameters['examId'] ?? ''),
-          ),
+
           GoRoute(
             path: RoutePaths.quests,
             name: 'quests',

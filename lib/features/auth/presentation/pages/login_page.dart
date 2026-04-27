@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:bitwise_academy/core/constants/app_colors.dart';
@@ -262,6 +263,15 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                   ),
                 ],
+                const SizedBox(height: AppSpacing.lg),
+                // Test Crash button for Firebase verification
+                PixelButton(
+                  label: 'TEST CRASH (FIREBASE)',
+                  onPressed: () => FirebaseCrashlytics.instance.crash(),
+                  isPrimary: false,
+                  backgroundColor: AppColors.error,
+                  width: double.infinity,
+                ),
               ],
             ),
           ),

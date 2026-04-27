@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:bitwise_academy/core/constants/app_colors.dart';
 import 'package:bitwise_academy/core/constants/app_spacing.dart';
@@ -409,6 +410,13 @@ class _UserDashboardPageState extends State<UserDashboardPage>
                 label: 'STORE',
                 onPressed: () => context.go('/store'),
                 isPrimary: false,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              PixelButton(
+                label: 'TEST CRASH',
+                onPressed: () => FirebaseCrashlytics.instance.crash(),
+                isPrimary: false,
+                backgroundColor: AppColors.error,
               ),
               const SizedBox(height: AppSpacing.md),
               FittedBox(

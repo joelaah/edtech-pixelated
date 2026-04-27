@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -141,6 +142,15 @@ class AdminDashboardPage extends StatelessWidget {
                         isPrimary: false,
                         width: double.infinity,
                         onPressed: () => context.go('/admin/manage-exams'),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      PixelButton(
+                        label: 'TEST CRASH (FIREBASE)',
+                        icon: Icons.bug_report,
+                        isPrimary: false,
+                        width: double.infinity,
+                        backgroundColor: AppColors.error,
+                        onPressed: () => FirebaseCrashlytics.instance.crash(),
                       ),
                     ],
                   ),

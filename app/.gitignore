@@ -47,3 +47,7 @@ app.*.map.json
 # Firebase Service Account
 service-account.json
 database_seed.json
+
+# Android keystore and secrets
+android/key.properties
+*.jks

@@ -43,6 +43,17 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
   String? _selectedDifficulty;
   String? _selectedGroup;
 
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>> _metadataStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _metadataStream = FirebaseFirestore.instance
+        .collection('system')
+        .doc('mock_test_metadata')
+        .snapshots();
+  }
+
   static const Map<String, String> _difficultyLabels = {
     'easy': 'EASY',
     'medium': 'MEDIUM',
@@ -67,10 +78,7 @@ class _MockTestConfigSheetState extends State<_MockTestConfigSheet> {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('system')
-          .doc('mock_test_metadata')
-          .snapshots(),
+      stream: _metadataStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(

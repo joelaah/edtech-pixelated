@@ -15,6 +15,7 @@ import 'package:bitwise_academy/features/dashboard/presentation/cubit/dashboard_
 import 'package:bitwise_academy/shared/models/user_entity.dart';
 import 'package:bitwise_academy/core/widgets/mock_test_config_sheet.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 /// Hero Dashboard matching the design mockup.
 ///

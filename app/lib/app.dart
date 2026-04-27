@@ -6,7 +6,6 @@ import 'package:bitwise_academy/core/di/injection.dart';
 import 'package:bitwise_academy/core/router/app_router.dart';
 import 'package:bitwise_academy/core/theme/app_theme.dart';
 import 'package:bitwise_academy/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:bitwise_academy/features/exam_library/presentation/bloc/exam_bloc.dart';
 import 'package:bitwise_academy/features/exam_library/presentation/bloc/attempt_bloc.dart';
 import 'package:bitwise_academy/features/quest/presentation/bloc/quest_bloc.dart';
 import 'package:bitwise_academy/features/leaderboard/presentation/bloc/leaderboard_bloc.dart';
@@ -42,9 +41,6 @@ class _RimsAppState extends State<RimsApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>.value(value: _authBloc),
-        BlocProvider<ExamBloc>(
-          create: (_) => getIt<ExamBloc>()..add(const LoadExamsRequested()),
-        ),
         BlocProvider<AttemptBloc>(create: (_) => getIt<AttemptBloc>()),
         BlocProvider<QuestBloc>(
           create: (_) =>

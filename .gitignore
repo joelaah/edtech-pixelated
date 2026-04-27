@@ -44,6 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Firebase Service Account
+# Firebase Service Account & Secrets
 service-account.json
+*-firebase-adminsdk-*.json
 database_seed.json
+*.jks
